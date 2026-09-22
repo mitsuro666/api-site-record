@@ -163,7 +163,6 @@ td:last-child,th:last-child{border-right:none}
   width:34px;height:34px;
   border:0;border-radius:11px;
   cursor:pointer;
-  margin-right:6px;
 }
 .edit{background:#e7f4ff;color:#2a92d5}
 .del{background:#ffe7ed;color:#e65f81}
@@ -172,16 +171,16 @@ td:last-child,th:last-child{border-right:none}
   color:var(--muted);
   padding:38px 20px;
 }
-.record-head{
+.record-head,
+.site-record{
   display:grid;
   grid-template-columns:minmax(150px,1.05fr) minmax(210px,1.45fr) minmax(0,1.55fr) minmax(110px,.70fr) 96px;
 }
-.site-record{
-  display:grid;
-  grid-template-columns:minmax(150px,1.05fr) minmax(210px,1.45fr) minmax(0,2.25fr) 96px;
-}
 .record-head{
-  border-bottom:1px solid var(--line);
+  margin:8px 8px 0;
+  border:1px solid var(--line);
+  border-radius:12px;
+  overflow:hidden;
   font-size:13px;
   font-weight:800;
 }
@@ -205,6 +204,7 @@ td:last-child,th:last-child{border-right:none}
   padding:14px;
   border-right:1px solid #f1e8e2;
   min-width:0;
+  align-self:stretch;
 }
 .site-name{
   font-weight:900;
@@ -234,34 +234,33 @@ td:last-child,th:last-child{border-right:none}
   word-break:break-all;
   font-size:12px;
 }
-.pair-list{
-  display:grid;
-  align-content:start;
-  border-right:1px solid #f1e8e2;
-}
-.pair-row{
-  display:grid;
-  grid-template-columns:minmax(0,2fr) minmax(110px,.9fr);
-  min-height:44px;
-  border-bottom:1px solid #f1e8e2;
-}
-.pair-row:last-child{border-bottom:none}
-.pair-model,
-.pair-price{
+.record-cell{
+  min-width:0;
   padding:11px 14px;
+  border-right:1px solid #f1e8e2;
+  border-bottom:1px solid #f1e8e2;
   display:flex;
   align-items:center;
-  min-width:0;
 }
-.pair-model{border-right:1px solid #f1e8e2;font-size:13px}
-.pair-price{font-weight:800;font-size:13px;background:#fffdf7}
+.model-cell{
+  font-size:13px;
+}
+.price-cell{
+  font-size:13px;
+  font-weight:800;
+  background:#fffdf7;
+}
+.record-cell.last-row{border-bottom:none}
 .pair-empty{color:var(--muted);font-weight:400}
 .site-controls{
+  grid-column:5;
   padding:10px;
   display:flex;
-  gap:6px;
-  align-items:flex-start;
-  justify-content:flex-end;
+  flex-direction:column;
+  gap:8px;
+  align-items:center;
+  justify-content:flex-start;
+  background:#fffdfb;
 }
 .modal-backdrop{
   position:fixed;inset:0;
@@ -406,8 +405,9 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
     background:transparent;
   }
   .site-record{
+    position:relative;
     display:grid;
-    grid-template-columns:1fr auto;
+    grid-template-columns:minmax(0,1fr) minmax(88px,.42fr);
     border-radius:18px;
     box-shadow:0 6px 16px rgba(80,65,75,.05);
   }
@@ -416,30 +416,35 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
     padding:12px 12px 4px;
   }
   .site-name{
-    grid-column:1;
+    grid-column:1/-1!important;
+    grid-row:auto!important;
     font-size:16px;
-    padding-right:4px;
+    padding-right:96px;
   }
   .site-url{
-    grid-column:1;
+    grid-column:1/-1!important;
+    grid-row:auto!important;
     padding-top:2px;
     padding-bottom:10px;
+    padding-right:96px;
   }
-  .pair-list{
-    grid-column:1/-1;
-    border-right:0;
-    border-top:1px solid var(--line);
-  }
-  .pair-row{
-    grid-template-columns:minmax(0,1fr) minmax(88px,.42fr);
+  .model-cell,
+  .price-cell{
+    grid-row:auto!important;
     min-height:42px;
+    border-top:1px solid var(--line);
+    border-bottom:none;
+    padding:10px 12px;
   }
-  .pair-model,.pair-price{padding:10px 12px}
+  .model-cell{grid-column:1!important}
+  .price-cell{grid-column:2!important;border-right:none}
   .site-controls{
-    grid-column:2;
-    grid-row:1 / span 2;
-    padding:10px 8px 0 0;
-    align-items:flex-start;
+    position:absolute;
+    top:10px;
+    right:8px;
+    padding:0;
+    flex-direction:row;
+    background:transparent;
   }
   .site-controls .del{display:none}
   .modal-backdrop{
@@ -610,21 +615,25 @@ function render(){
 
   recordList.innerHTML = filtered.length ? filtered.map(r => {
     const pairs = (r.modelPrices || []).length ? r.modelPrices : [{model:"",price:""}];
-    const pairHtml = pairs.map(x => `
-      <div class="pair-row">
-        <div class="pair-model ${x.model ? "" : "pair-empty"}">${esc(x.model || "—")}</div>
-        <div class="pair-price ${x.price ? "" : "pair-empty"}">${esc(x.price || "—")}</div>
-      </div>
+    const rowSpan = pairs.length;
+    const pairHtml = pairs.map((x,idx) => `
+      <div class="record-cell model-cell ${x.model ? "" : "pair-empty"} ${idx===rowSpan-1 ? "last-row" : ""}"
+           style="grid-column:3;grid-row:${idx+1}">${esc(x.model || "—")}</div>
+      <div class="record-cell price-cell ${x.price ? "" : "pair-empty"} ${idx===rowSpan-1 ? "last-row" : ""}"
+           style="grid-column:4;grid-row:${idx+1}">${esc(x.price || "—")}</div>
     `).join("");
+
     return `
       <div class="site-record">
-        <div class="site-cell site-name">
+        <div class="site-cell site-name" style="grid-column:1;grid-row:1 / span ${rowSpan}">
           <span>${esc(r.name)}</span>
           <span class="mini-check ${r.check?'yes':'no'}">${r.check?'有':'无'}</span>
         </div>
-        <div class="site-cell site-url"><a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.url)}</a></div>
-        <div class="pair-list">${pairHtml}</div>
-        <div class="site-controls">
+        <div class="site-cell site-url" style="grid-column:2;grid-row:1 / span ${rowSpan}">
+          <a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.url)}</a>
+        </div>
+        ${pairHtml}
+        <div class="site-controls" style="grid-row:1 / span ${rowSpan}">
           <button class="icon-btn edit" onclick="editRow(${r._i})" title="编辑">✎</button>
           <button class="icon-btn del" onclick="deleteRow(${r._i})" title="删除">×</button>
         </div>
