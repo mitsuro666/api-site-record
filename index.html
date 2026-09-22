@@ -383,6 +383,13 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
   align-items:center;
 }
 .model-price-row select,.model-price-row input{min-width:0}
+.custom-model-input{
+  grid-column:1;
+  display:none;
+  border-color:var(--pink)!important;
+  background:#fffafd!important;
+}
+.custom-model-input.show{display:block}
 .remove-pair{
   width:38px;height:38px;border:0;border-radius:11px;
   background:#ffe7ed;color:#d95f80;cursor:pointer;font-weight:900;
@@ -861,28 +868,50 @@ function setCheck(v){
   $("checkNo").classList.toggle("active", !v);
 }
 function modelOptionsHtml(selected=""){
-  const options = selected && !MODEL_OPTIONS.includes(selected)
-    ? [selected, ...MODEL_OPTIONS]
-    : MODEL_OPTIONS;
+  const isCustom = Boolean(selected && !MODEL_OPTIONS.includes(selected));
   const base = '<option value="">选择模型</option>';
-  return base + options.map(m=>`<option value="${esc(m)}" ${m===selected?"selected":""}>${esc(m)}</option>`).join("");
+  const preset = MODEL_OPTIONS
+    .map(m=>`<option value="${esc(m)}" ${m===selected?"selected":""}>${esc(m)}</option>`)
+    .join("");
+  const custom = `<option value="__custom__" ${isCustom?"selected":""}>＋ 自定义模型名称</option>`;
+  return base + preset + custom;
 }
 function addModelPriceRow(item={model:"",price:""}){
   const wrap = document.createElement("div");
   wrap.className = "model-price-row";
+  const isCustom = Boolean(item.model && !MODEL_OPTIONS.includes(item.model));
   wrap.innerHTML = `
     <select class="model-select">${modelOptionsHtml(item.model || "")}</select>
     <input class="price-input" placeholder="价格" value="${esc(item.price || "")}">
     <button class="remove-pair" type="button" title="删除">×</button>
+    <input class="custom-model-input ${isCustom ? "show" : ""}" placeholder="输入自定义模型名称" value="${isCustom ? esc(item.model) : ""}">
   `;
+
+  const select = wrap.querySelector(".model-select");
+  const customInput = wrap.querySelector(".custom-model-input");
+
+  select.addEventListener("change", ()=>{
+    const customMode = select.value === "__custom__";
+    customInput.classList.toggle("show", customMode);
+    if(customMode){
+      setTimeout(()=>customInput.focus(), 0);
+    }else{
+      customInput.value = "";
+    }
+  });
+
   wrap.querySelector(".remove-pair").onclick = ()=>wrap.remove();
   $("modelPriceList").appendChild(wrap);
 }
 function getEditorModelPrices(){
-  return [...$("modelPriceList").querySelectorAll(".model-price-row")].map(row=>({
-    model:row.querySelector(".model-select").value.trim(),
-    price:row.querySelector(".price-input").value.trim()
-  })).filter(x=>x.model || x.price);
+  return [...$("modelPriceList").querySelectorAll(".model-price-row")].map(row=>{
+    const selectValue = row.querySelector(".model-select").value.trim();
+    const customValue = row.querySelector(".custom-model-input").value.trim();
+    return {
+      model:selectValue === "__custom__" ? customValue : selectValue,
+      price:row.querySelector(".price-input").value.trim()
+    };
+  }).filter(x=>x.model || x.price);
 }
 function openEditor(data=null,index=null){
   editingIndex = index;
