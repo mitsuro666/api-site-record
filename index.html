@@ -206,6 +206,75 @@ td:last-child,th:last-child{border-right:none}
   outline:none;
 }
 .head-select:focus{border-color:var(--pink)}
+.multi-filter{
+  position:relative;
+  min-width:0;
+}
+.multi-filter summary{
+  list-style:none;
+  cursor:pointer;
+  min-width:0;
+  width:100%;
+  height:30px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  border:1px solid rgba(160,140,145,.18);
+  background:rgba(255,255,255,.72);
+  border-radius:9px;
+  padding:0 8px;
+  font-size:11px;
+  color:#596171;
+  font-weight:500;
+}
+.multi-filter summary::-webkit-details-marker{display:none}
+.multi-filter summary::after{
+  content:"⌄";
+  flex:0 0 auto;
+  color:#7b8390;
+}
+.multi-filter[open] summary{
+  border-color:var(--pink);
+  background:#fff;
+}
+.multi-options{
+  position:absolute;
+  left:0;
+  top:calc(100% + 5px);
+  z-index:30;
+  width:max(100%, 220px);
+  max-height:260px;
+  overflow:auto;
+  padding:7px;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:12px;
+  box-shadow:0 12px 28px rgba(70,55,65,.14);
+}
+.multi-option{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:7px 8px;
+  border-radius:8px;
+  font-size:11px;
+  font-weight:500;
+  color:#4f5664;
+  cursor:pointer;
+}
+.multi-option:hover{background:#fff5f8}
+.multi-option input{
+  width:15px;
+  height:15px;
+  margin:0;
+  accent-color:var(--pink-deep);
+}
+.multi-empty{
+  padding:9px 8px;
+  font-size:11px;
+  color:var(--muted);
+}
 .reset-filter{
   width:100%;
   height:30px;
@@ -506,6 +575,19 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
     font-size:12px;
     color:#596171;
   }
+  .mobile-filters .multi-filter{min-width:0}
+  .mobile-filters .multi-filter summary{
+    height:38px;
+    border:1px solid var(--line);
+    border-radius:11px;
+    background:#fff;
+    padding:0 9px;
+    font-size:12px;
+  }
+  .mobile-filters .multi-options{
+    width:min(300px, calc(100vw - 24px));
+    max-height:300px;
+  }
   .mobile-filters .wide{grid-column:1/-1}
   .mobile-filters button{
     background:var(--cream);
@@ -603,9 +685,10 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
     <div class="head-cell">
       <div class="head-label">网站名</div>
       <div class="head-filter-row">
-        <select class="head-select filter-control" data-filter="site">
-          <option value="">全部站点</option>
-        </select>
+        <details class="multi-filter" data-multi-filter="sites">
+          <summary data-multi-summary="sites">全部站点</summary>
+          <div class="multi-options" data-multi-options="sites"></div>
+        </details>
         <select class="head-select filter-control" data-filter="check">
           <option value="all">签到：全部</option>
           <option value="yes">签到：有</option>
@@ -615,17 +698,13 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
     </div>
     <div class="head-cell">
       <div class="head-label">网址</div>
-      <select class="head-select filter-control" data-filter="urlSort">
-        <option value="none">默认顺序</option>
-        <option value="asc">网址 A→Z</option>
-        <option value="desc">网址 Z→A</option>
-      </select>
     </div>
     <div class="head-cell">
       <div class="head-label">主要模型</div>
-      <select class="head-select filter-control" data-filter="model">
-        <option value="">全部模型</option>
-      </select>
+      <details class="multi-filter" data-multi-filter="models">
+        <summary data-multi-summary="models">全部模型</summary>
+        <div class="multi-options" data-multi-options="models"></div>
+      </details>
     </div>
     <div class="head-cell">
       <div class="head-label">价格</div>
@@ -642,26 +721,23 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
   </div>
 
   <div class="mobile-filters">
-    <select class="filter-control" data-filter="site">
-      <option value="">全部站点</option>
-    </select>
+    <details class="multi-filter" data-multi-filter="sites">
+      <summary data-multi-summary="sites">全部站点</summary>
+      <div class="multi-options" data-multi-options="sites"></div>
+    </details>
     <select class="filter-control" data-filter="check">
       <option value="all">签到：全部</option>
       <option value="yes">签到：有</option>
       <option value="no">签到：无</option>
     </select>
-    <select class="filter-control wide" data-filter="model">
-      <option value="">全部模型</option>
-    </select>
-    <select class="filter-control" data-filter="priceSort">
+    <details class="multi-filter wide" data-multi-filter="models">
+      <summary data-multi-summary="models">全部模型</summary>
+      <div class="multi-options" data-multi-options="models"></div>
+    </details>
+    <select class="filter-control wide" data-filter="priceSort">
       <option value="none">价格默认</option>
       <option value="asc">价格低→高</option>
       <option value="desc">价格高→低</option>
-    </select>
-    <select class="filter-control" data-filter="urlSort">
-      <option value="none">网址默认</option>
-      <option value="asc">网址 A→Z</option>
-      <option value="desc">网址 Z→A</option>
     </select>
     <button class="wide" type="button" data-reset-filters>重置筛选</button>
   </div>
@@ -772,11 +848,10 @@ const expandedSites = new Set();
 const COLLAPSED_MODEL_LIMIT = 7;
 
 const filterState = {
-  site:"",
+  sites:[],
   check:"all",
-  model:"",
-  priceSort:"none",
-  urlSort:"none"
+  models:[],
+  priceSort:"none"
 };
 
 function esc(s=""){
@@ -794,9 +869,29 @@ function sortPriceForRecord(record){
   if(!nums.length) return null;
   return filterState.priceSort === "desc" ? Math.max(...nums) : Math.min(...nums);
 }
-function hostnameFor(url){
-  try{return new URL(url).hostname.toLowerCase();}
-  catch{return String(url || "").toLowerCase();}
+function multiSummaryText(kind){
+  const selected = filterState[kind];
+  if(!selected.length) return kind==="sites" ? "全部站点" : "全部模型";
+  if(selected.length===1) return selected[0];
+  return `已选 ${selected.length} 个${kind==="sites" ? "站点" : "模型"}`;
+}
+function renderMultiOptions(kind, values){
+  const selected = filterState[kind];
+  const content = values.length
+    ? values.map(value=>`
+        <label class="multi-option">
+          <input type="checkbox" data-multi-kind="${kind}" value="${esc(value)}" ${selected.includes(value) ? "checked" : ""}>
+          <span>${esc(value)}</span>
+        </label>
+      `).join("")
+    : '<div class="multi-empty">暂无可选项</div>';
+
+  document.querySelectorAll(`[data-multi-options="${kind}"]`).forEach(box=>{
+    box.innerHTML = content;
+  });
+  document.querySelectorAll(`[data-multi-summary="${kind}"]`).forEach(summary=>{
+    summary.textContent = multiSummaryText(kind);
+  });
 }
 function refreshFilterOptions(){
   const siteNames = [...new Set(rows.map(r=>r.name).filter(Boolean))]
@@ -806,25 +901,14 @@ function refreshFilterOptions(){
     ...rows.flatMap(r=>(r.modelPrices || []).map(x=>x.model)).filter(Boolean)
   ])].sort((a,b)=>a.localeCompare(b,"en"));
 
-  document.querySelectorAll('[data-filter="site"]').forEach(select=>{
-    const current = filterState.site;
-    select.innerHTML = '<option value="">全部站点</option>' +
-      siteNames.map(name=>`<option value="${esc(name)}">${esc(name)}</option>`).join("");
-    select.value = siteNames.includes(current) ? current : "";
-    if(current && !siteNames.includes(current)) filterState.site = "";
-  });
+  filterState.sites = filterState.sites.filter(name=>siteNames.includes(name));
+  filterState.models = filterState.models.filter(name=>modelNames.includes(name));
 
-  document.querySelectorAll('[data-filter="model"]').forEach(select=>{
-    const current = filterState.model;
-    select.innerHTML = '<option value="">全部模型</option>' +
-      modelNames.map(name=>`<option value="${esc(name)}">${esc(name)}</option>`).join("");
-    select.value = modelNames.includes(current) ? current : "";
-    if(current && !modelNames.includes(current)) filterState.model = "";
-  });
+  renderMultiOptions("sites", siteNames);
+  renderMultiOptions("models", modelNames);
 
   document.querySelectorAll('[data-filter="check"]').forEach(el=>el.value=filterState.check);
   document.querySelectorAll('[data-filter="priceSort"]').forEach(el=>el.value=filterState.priceSort);
-  document.querySelectorAll('[data-filter="urlSort"]').forEach(el=>el.value=filterState.urlSort);
 }
 function render(){
   refreshFilterOptions();
@@ -833,13 +917,13 @@ function render(){
     .map((r,i)=>({
       ...r,
       _i:i,
-      visiblePairs: filterState.model
-        ? (r.modelPrices || []).filter(x=>x.model===filterState.model)
+      visiblePairs: filterState.models.length
+        ? (r.modelPrices || []).filter(x=>filterState.models.includes(x.model))
         : [...(r.modelPrices || [])]
     }))
-    .filter(r => !filterState.site || r.name===filterState.site)
+    .filter(r => !filterState.sites.length || filterState.sites.includes(r.name))
     .filter(r => filterState.check==="all" || (filterState.check==="yes" ? r.check : !r.check))
-    .filter(r => !filterState.model || r.visiblePairs.length>0);
+    .filter(r => !filterState.models.length || r.visiblePairs.length>0);
 
   if(filterState.priceSort!=="none"){
     filtered.sort((a,b)=>{
@@ -849,14 +933,6 @@ function render(){
       if(av===null) return 1;
       if(bv===null) return -1;
       return filterState.priceSort==="asc" ? av-bv : bv-av;
-    });
-  }else if(filterState.urlSort!=="none"){
-    filtered.sort((a,b)=>{
-      const av = hostnameFor(a.url);
-      const bv = hostnameFor(b.url);
-      return filterState.urlSort==="asc"
-        ? av.localeCompare(bv,"en")
-        : bv.localeCompare(av,"en");
     });
   }
 
@@ -874,7 +950,7 @@ function render(){
       });
     }
 
-    const canCollapse = !filterState.model && pairs.length > COLLAPSED_MODEL_LIMIT;
+    const canCollapse = !filterState.models.length && pairs.length > COLLAPSED_MODEL_LIMIT;
     const isExpanded = expandedSites.has(r._i);
     const shownPairs = canCollapse && !isExpanded
       ? pairs.slice(0, COLLAPSED_MODEL_LIMIT)
@@ -1014,15 +1090,32 @@ document.querySelectorAll(".filter-control").forEach(control=>{
     render();
   });
 });
+document.addEventListener("change", e=>{
+  const input = e.target.closest("[data-multi-kind]");
+  if(!input) return;
+
+  const kind = input.dataset.multiKind;
+  const selected = new Set(filterState[kind]);
+
+  if(input.checked) selected.add(input.value);
+  else selected.delete(input.value);
+
+  filterState[kind] = [...selected];
+  render();
+});
 document.querySelectorAll("[data-reset-filters]").forEach(button=>{
   button.addEventListener("click", ()=>{
-    filterState.site = "";
+    filterState.sites = [];
     filterState.check = "all";
-    filterState.model = "";
+    filterState.models = [];
     filterState.priceSort = "none";
-    filterState.urlSort = "none";
+    document.querySelectorAll(".multi-filter[open]").forEach(el=>el.open=false);
     render();
   });
+});
+document.addEventListener("click", e=>{
+  if(e.target.closest(".multi-filter")) return;
+  document.querySelectorAll(".multi-filter[open]").forEach(el=>el.open=false);
 });
 
 $("exportBtn").onclick = ()=>{
