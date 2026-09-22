@@ -154,6 +154,10 @@ td:last-child,th:last-child{border-right:none}
   width:34px;height:34px;
   border:0;border-radius:11px;
   cursor:pointer;
+  display:grid;
+  place-items:center;
+  padding:0;
+  line-height:1;
 }
 .edit{background:#e7f4ff;color:#2a92d5}
 .del{background:#ffe7ed;color:#e65f81}
@@ -646,7 +650,12 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
     min-height:42px;
     padding:10px 12px;
   }
-  .site-controls .del{display:inline-grid}
+  .site-controls .del{
+    display:grid;
+    place-items:center;
+    padding:0;
+    line-height:1;
+  }
   .modal-backdrop{
     align-items:flex-end;
     padding:0;
