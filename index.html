@@ -164,19 +164,27 @@ td:last-child,th:last-child{border-right:none}
 }
 .record-head{
   display:grid;
-  grid-template-columns:minmax(150px,1.05fr) minmax(210px,1.45fr) minmax(0,1.55fr) minmax(110px,.70fr) 96px;
+  grid-template-columns:minmax(190px,1.15fr) minmax(120px,.65fr) minmax(260px,1.55fr) minmax(130px,.70fr) 110px;
 }
 .record-head{
   margin:8px 8px 0;
   border:1px solid var(--line);
   border-radius:12px;
-  overflow:hidden;
+  overflow:visible;
+  position:relative;
+  z-index:20;
   font-size:13px;
   font-weight:800;
 }
 .record-head > div{
   padding:10px 12px;
   border-right:1px solid #f1e8e2;
+}
+.record-head > div:first-child{
+  border-radius:11px 0 0 11px;
+}
+.record-head > div:last-child{
+  border-radius:0 11px 11px 0;
 }
 .head-cell{
   display:flex;
@@ -209,6 +217,7 @@ td:last-child,th:last-child{border-right:none}
 .multi-filter{
   position:relative;
   min-width:0;
+  width:100%;
 }
 .multi-filter summary{
   list-style:none;
@@ -227,6 +236,9 @@ td:last-child,th:last-child{border-right:none}
   font-size:11px;
   color:#596171;
   font-weight:500;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 .multi-filter summary::-webkit-details-marker{display:none}
 .multi-filter summary::after{
@@ -242,8 +254,8 @@ td:last-child,th:last-child{border-right:none}
   position:absolute;
   left:0;
   top:calc(100% + 5px);
-  z-index:30;
-  width:max(100%, 220px);
+  z-index:100;
+  width:max(100%, 240px);
   max-height:260px;
   overflow:auto;
   padding:7px;
@@ -684,20 +696,18 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
   <div class="record-head">
     <div class="head-cell">
       <div class="head-label">网站名</div>
-      <div class="head-filter-row">
-        <details class="multi-filter" data-multi-filter="sites">
-          <summary data-multi-summary="sites">全部站点</summary>
-          <div class="multi-options" data-multi-options="sites"></div>
-        </details>
-        <select class="head-select filter-control" data-filter="check">
-          <option value="all">签到：全部</option>
-          <option value="yes">签到：有</option>
-          <option value="no">签到：无</option>
-        </select>
-      </div>
+      <details class="multi-filter" data-multi-filter="sites">
+        <summary data-multi-summary="sites">全部站点</summary>
+        <div class="multi-options" data-multi-options="sites"></div>
+      </details>
     </div>
     <div class="head-cell">
-      <div class="head-label">网址</div>
+      <div class="head-label">签到</div>
+      <select class="head-select filter-control" data-filter="check">
+        <option value="all">全部</option>
+        <option value="yes">有</option>
+        <option value="no">无</option>
+      </select>
     </div>
     <div class="head-cell">
       <div class="head-label">主要模型</div>
