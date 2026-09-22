@@ -172,7 +172,7 @@ td:last-child,th:last-child{border-right:none}
 }
 .record-head{
   display:grid;
-  grid-template-columns:minmax(190px,1.15fr) minmax(120px,.65fr) minmax(260px,1.55fr) minmax(130px,.70fr) 110px;
+  grid-template-columns:minmax(180px,1fr) minmax(110px,.55fr) minmax(240px,1.35fr) minmax(240px,1.15fr) 110px;
 }
 .record-head{
   margin:8px 8px 0;
@@ -222,6 +222,25 @@ td:last-child,th:last-child{border-right:none}
   outline:none;
 }
 .head-select:focus{border-color:var(--pink)}
+.price-filter-tools{
+  display:flex;
+  gap:6px;
+  min-width:0;
+}
+.price-filter-tools .head-select{flex:1}
+.head-search{
+  width:108px;
+  min-width:86px;
+  height:30px;
+  border:1px solid rgba(160,140,145,.18);
+  background:rgba(255,255,255,.78);
+  border-radius:9px;
+  padding:0 8px;
+  font-size:11px;
+  color:#596171;
+  outline:none;
+}
+.head-search:focus{border-color:var(--pink);background:#fff}
 .multi-filter{
   position:relative;
   min-width:0;
@@ -380,45 +399,49 @@ td:last-child,th:last-child{border-right:none}
   justify-content:flex-end;
 }
 .model-table{
+  display:block;
+}
+.model-table-head-row,
+.model-data-row{
   display:grid;
-  grid-template-columns:minmax(0,1fr) minmax(120px,180px);
+  grid-template-columns:minmax(220px,1.4fr) minmax(90px,.48fr) minmax(100px,.62fr) minmax(120px,.72fr) minmax(180px,1fr);
 }
 .model-table-head{
-  padding:8px 14px;
+  padding:8px 12px;
   font-size:11px;
   font-weight:900;
   color:#687080;
   border-bottom:1px solid var(--line);
-}
-.model-table-head.model-head{
-  background:#fff4f7;
   border-right:1px solid #f1e8e2;
 }
-.model-table-head.price-head{
-  background:#fff7d9;
-}
+.model-table-head:last-child{border-right:none}
+.model-table-head.model-head{background:#fff4f7}
+.model-table-head.price-head{background:#fff7d9}
+.model-table-head.speed-head{background:#eef8ff}
+.model-table-head.tags-head{background:#f3f0ff}
+.model-table-head.note-head{background:#fff5eb}
 .model-cell,
-.price-cell{
+.price-cell,
+.speed-cell,
+.tags-cell,
+.note-cell{
   min-width:0;
   min-height:42px;
-  padding:10px 14px;
+  padding:10px 12px;
   display:flex;
   align-items:center;
   border-bottom:1px solid #f1e8e2;
-}
-.model-cell{
-  font-size:13px;
   border-right:1px solid #f1e8e2;
-}
-.price-cell{
   font-size:13px;
-  font-weight:800;
-  background:#fffdf7;
+  overflow-wrap:anywhere;
 }
-.model-cell.last-row,
-.price-cell.last-row{
-  border-bottom:none;
-}
+.note-cell{border-right:none}
+.model-cell{font-weight:500}
+.price-cell{font-weight:800;background:#fffdf7}
+.speed-cell{background:#fbfdff}
+.tags-cell{background:#fdfcff}
+.note-cell{background:#fffdfb;color:#596171}
+.model-data-row.last-row > div{border-bottom:none}
 .pair-empty{color:var(--muted);font-weight:400}
 .model-toggle{
   grid-column:1/-1;
@@ -513,18 +536,29 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
 .model-price-list{display:grid;gap:8px}
 .model-price-row{
   display:grid;
-  grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) 38px;
+  grid-template-columns:minmax(0,1.4fr) minmax(120px,.7fr) 38px;
   gap:8px;
   align-items:center;
+  padding:10px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:#fffdfa;
 }
 .model-price-row select,.model-price-row input{min-width:0}
 .custom-model-input{
-  grid-column:1;
+  grid-column:1 / 3;
   display:none;
   border-color:var(--pink)!important;
   background:#fffafd!important;
 }
 .custom-model-input.show{display:block}
+.model-extra-fields{
+  grid-column:1 / 3;
+  display:grid;
+  grid-template-columns:minmax(0,.75fr) minmax(0,1fr) minmax(0,1.4fr);
+  gap:8px;
+}
+.model-extra-fields input{font-size:13px}
 .remove-pair{
   width:38px;height:38px;border:0;border-radius:11px;
   background:#ffe7ed;color:#d95f80;cursor:pointer;font-weight:900;
@@ -584,7 +618,8 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
     background:#fffaf7;
   }
   .mobile-filters select,
-  .mobile-filters button{
+  .mobile-filters button,
+  .mobile-filters .text-search{
     width:100%;
     min-width:0;
     height:38px;
@@ -643,17 +678,37 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
     right:8px;
     gap:6px;
   }
-  .model-table{
-    grid-template-columns:minmax(0,1fr) minmax(88px,.42fr);
+  .model-table-head-row{display:none}
+  .model-data-row{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 92px;
+    border-bottom:1px solid var(--line);
   }
-  .model-table-head{
-    padding:7px 12px;
-  }
+  .model-data-row.last-row{border-bottom:none}
   .model-cell,
-  .price-cell{
+  .price-cell,
+  .speed-cell,
+  .tags-cell,
+  .note-cell{
     min-height:42px;
     padding:10px 12px;
+    border-bottom:0;
   }
+  .model-cell{grid-column:1;border-right:1px solid var(--line)}
+  .price-cell{grid-column:2;border-right:none}
+  .speed-cell,
+  .tags-cell,
+  .note-cell{
+    grid-column:1/-1;
+    min-height:34px;
+    padding:7px 12px;
+    border-right:none;
+    border-top:1px dashed #eee3dd;
+    font-size:12px;
+  }
+  .speed-cell::before{content:"速度  ";font-weight:800;color:var(--muted);margin-right:6px}
+  .tags-cell::before{content:"标签  ";font-weight:800;color:var(--muted);margin-right:6px}
+  .note-cell::before{content:"备注  ";font-weight:800;color:var(--muted);margin-right:6px}
   .site-controls .del{
     display:grid;
     place-items:center;
@@ -681,10 +736,18 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
   .form-grid{grid-template-columns:1fr}
   .field.full{grid-column:auto}
   input,textarea,select{font-size:16px}
-  .model-price-row{grid-template-columns:minmax(0,1fr) 38px}
-  .model-price-row .price-input{grid-column:1 / 2}
+  .model-price-row{
+    grid-template-columns:minmax(0,1fr) 38px;
+    padding:9px;
+  }
+  .model-price-row .price-input{grid-column:1}
   .model-price-row .remove-pair{
-    grid-column:2;grid-row:1 / span 2;height:100%;min-height:82px;
+    grid-column:2;grid-row:1 / span 3;height:100%;min-height:82px;
+  }
+  .custom-model-input{grid-column:1}
+  .model-extra-fields{
+    grid-column:1;
+    grid-template-columns:1fr;
   }
   .save{padding:14px}
   @keyframes slideUp{
@@ -731,11 +794,14 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
     </div>
     <div class="head-cell">
       <div class="head-label">价格</div>
-      <select class="head-select filter-control" data-filter="priceSort">
-        <option value="none">默认顺序</option>
-        <option value="asc">价格低→高</option>
-        <option value="desc">价格高→低</option>
-      </select>
+      <div class="price-filter-tools">
+        <select class="head-select filter-control" data-filter="priceSort">
+          <option value="none">默认顺序</option>
+          <option value="asc">价格低→高</option>
+          <option value="desc">价格高→低</option>
+        </select>
+        <input class="head-search text-search" type="search" placeholder="搜索">
+      </div>
     </div>
     <div class="head-cell">
       <div class="head-label">操作</div>
@@ -757,11 +823,12 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
       <summary data-multi-summary="models">全部模型</summary>
       <div class="multi-options" data-multi-options="models"></div>
     </details>
-    <select class="filter-control wide" data-filter="priceSort">
+    <select class="filter-control" data-filter="priceSort">
       <option value="none">价格默认</option>
       <option value="asc">价格低→高</option>
       <option value="desc">价格高→低</option>
     </select>
+    <input class="text-search" type="search" placeholder="搜索任意文本">
     <button class="wide" type="button" data-reset-filters>重置筛选</button>
   </div>
 
@@ -841,13 +908,22 @@ function normalizeModelPrices(item){
   if(Array.isArray(item?.modelPrices)){
     return item.modelPrices.map(x=>({
       model:String(x?.model ?? "").trim(),
-      price:String(x?.price ?? "").trim()
-    })).filter(x=>x.model || x.price);
+      price:String(x?.price ?? "").trim(),
+      speed:String(x?.speed ?? "").trim(),
+      tags:String(x?.tags ?? x?.tag ?? "").trim(),
+      note:String(x?.note ?? x?.remark ?? "").trim()
+    })).filter(x=>x.model || x.price || x.speed || x.tags || x.note);
   }
   if(typeof item?.models === "string" && item.models.trim()){
     return item.models.split("\n").filter(Boolean).map(line=>{
       const parts = line.split(/｜|\|/);
-      return {model:(parts.shift() || "").trim(),price:parts.join("｜").trim()};
+      return {
+        model:(parts.shift() || "").trim(),
+        price:parts.join("｜").trim(),
+        speed:"",
+        tags:"",
+        note:""
+      };
     });
   }
   return [];
@@ -861,7 +937,7 @@ function normalizeRecord(item){
   };
 }
 const stored = JSON.parse(localStorage.getItem("api-records-demo") || "null");
-let rows = Array.isArray(stored) ? stored.map(normalizeRecord) : seed;
+let rows = Array.isArray(stored) ? stored.map(normalizeRecord) : seed.map(normalizeRecord);
 let editingIndex = null;
 let checkValue = true;
 
@@ -874,7 +950,8 @@ const filterState = {
   sites:[],
   check:"all",
   models:[],
-  priceSort:"none"
+  priceSort:"none",
+  search:""
 };
 
 function esc(s=""){
@@ -928,6 +1005,9 @@ function syncMultiFilterUI(kind){
 function syncSimpleFilterUI(){
   document.querySelectorAll('[data-filter="check"]').forEach(el=>el.value=filterState.check);
   document.querySelectorAll('[data-filter="priceSort"]').forEach(el=>el.value=filterState.priceSort);
+  document.querySelectorAll('.text-search').forEach(el=>{
+    if(el.value !== filterState.search) el.value = filterState.search;
+  });
 }
 function refreshFilterOptions(){
   const siteNames = [...new Set(rows.map(r=>r.name).filter(Boolean))]
@@ -952,17 +1032,38 @@ function render(refreshFilters=true){
     syncSimpleFilterUI();
   }
 
+  const query = filterState.search.trim().toLowerCase();
+
   let filtered = rows
-    .map((r,i)=>({
-      ...r,
-      _i:i,
-      visiblePairs: filterState.models.length
+    .map((r,i)=>{
+      const basePairs = filterState.models.length
         ? (r.modelPrices || []).filter(x=>filterState.models.includes(x.model))
-        : [...(r.modelPrices || [])]
-    }))
+        : [...(r.modelPrices || [])];
+
+      const siteText = [
+        r.name,
+        r.url,
+        r.check ? "有 签到" : "无 不签到"
+      ].join(" ").toLowerCase();
+
+      const siteMatchesSearch = !query || siteText.includes(query);
+      const searchPairs = !query || siteMatchesSearch
+        ? basePairs
+        : basePairs.filter(x=>[
+            x.model,x.price,x.speed,x.tags,x.note
+          ].join(" ").toLowerCase().includes(query));
+
+      return {
+        ...r,
+        _i:i,
+        visiblePairs:searchPairs,
+        siteMatchesSearch
+      };
+    })
     .filter(r => !filterState.sites.length || filterState.sites.includes(r.name))
     .filter(r => filterState.check==="all" || (filterState.check==="yes" ? r.check : !r.check))
-    .filter(r => !filterState.models.length || r.visiblePairs.length>0);
+    .filter(r => !filterState.models.length || r.visiblePairs.length>0)
+    .filter(r => !query || r.siteMatchesSearch || r.visiblePairs.length>0);
 
   if(filterState.priceSort!=="none"){
     filtered.sort((a,b)=>{
@@ -989,7 +1090,7 @@ function render(refreshFilters=true){
       });
     }
 
-    const canCollapse = !filterState.models.length && pairs.length > COLLAPSED_MODEL_LIMIT;
+    const canCollapse = !filterState.models.length && !query && pairs.length > COLLAPSED_MODEL_LIMIT;
     const isExpanded = expandedSites.has(r._i);
     const shownPairs = canCollapse && !isExpanded
       ? pairs.slice(0, COLLAPSED_MODEL_LIMIT)
@@ -998,8 +1099,13 @@ function render(refreshFilters=true){
     const pairHtml = shownPairs.map((x,idx) => {
       const isLast = idx===shownPairs.length-1 && !canCollapse;
       return `
-        <div class="model-cell ${x.model ? "" : "pair-empty"} ${isLast ? "last-row" : ""}">${esc(x.model || "—")}</div>
-        <div class="price-cell ${x.price ? "" : "pair-empty"} ${isLast ? "last-row" : ""}">${esc(x.price || "—")}</div>
+        <div class="model-data-row ${isLast ? "last-row" : ""}">
+          <div class="model-cell ${x.model ? "" : "pair-empty"}">${esc(x.model || "—")}</div>
+          <div class="price-cell ${x.price ? "" : "pair-empty"}">${esc(x.price || "—")}</div>
+          <div class="speed-cell ${x.speed ? "" : "pair-empty"}">${esc(x.speed || "—")}</div>
+          <div class="tags-cell ${x.tags ? "" : "pair-empty"}">${esc(x.tags || "—")}</div>
+          <div class="note-cell ${x.note ? "" : "pair-empty"}">${esc(x.note || "—")}</div>
+        </div>
       `;
     }).join("");
 
@@ -1024,8 +1130,13 @@ function render(refreshFilters=true){
         </div>
 
         <div class="model-table">
-          <div class="model-table-head model-head">主要模型</div>
-          <div class="model-table-head price-head">价格</div>
+          <div class="model-table-head-row">
+            <div class="model-table-head model-head">主要模型</div>
+            <div class="model-table-head price-head">价格</div>
+            <div class="model-table-head speed-head">速度</div>
+            <div class="model-table-head tags-head">标签</div>
+            <div class="model-table-head note-head">备注</div>
+          </div>
           ${pairHtml}
           ${toggleHtml}
         </div>
@@ -1059,6 +1170,11 @@ function addModelPriceRow(item={model:"",price:""}){
     <input class="price-input" placeholder="价格" value="${esc(item.price || "")}">
     <button class="remove-pair" type="button" title="删除">×</button>
     <input class="custom-model-input ${isCustom ? "show" : ""}" placeholder="输入自定义模型名称" value="${isCustom ? esc(item.model) : ""}">
+    <div class="model-extra-fields">
+      <input class="speed-input" placeholder="速度" value="${esc(item.speed || "")}">
+      <input class="tags-input" placeholder="标签" value="${esc(item.tags || "")}">
+      <input class="note-input" placeholder="备注" value="${esc(item.note || "")}">
+    </div>
   `;
 
   const select = wrap.querySelector(".model-select");
@@ -1083,9 +1199,12 @@ function getEditorModelPrices(){
     const customValue = row.querySelector(".custom-model-input").value.trim();
     return {
       model:selectValue === "__custom__" ? customValue : selectValue,
-      price:row.querySelector(".price-input").value.trim()
+      price:row.querySelector(".price-input").value.trim(),
+      speed:row.querySelector(".speed-input").value.trim(),
+      tags:row.querySelector(".tags-input").value.trim(),
+      note:row.querySelector(".note-input").value.trim()
     };
-  }).filter(x=>x.model || x.price);
+  }).filter(x=>x.model || x.price || x.speed || x.tags || x.note);
 }
 function openEditor(data=null,index=null){
   editingIndex = index;
@@ -1123,6 +1242,12 @@ $("checkYes").onclick = ()=>setCheck(true);
 $("checkNo").onclick = ()=>setCheck(false);
 $("addModelBtn").onclick = ()=>addModelPriceRow();
 
+document.querySelectorAll(".text-search").forEach(input=>{
+  input.addEventListener("input", e=>{
+    filterState.search = e.target.value;
+    render(false);
+  });
+});
 document.querySelectorAll(".filter-control").forEach(control=>{
   control.addEventListener("change", e=>{
     const key = e.target.dataset.filter;
@@ -1150,6 +1275,7 @@ document.querySelectorAll("[data-reset-filters]").forEach(button=>{
     filterState.check = "all";
     filterState.models = [];
     filterState.priceSort = "none";
+    filterState.search = "";
     document.querySelectorAll(".multi-filter[open]").forEach(el=>el.open=false);
     render(false);
   });
@@ -1161,7 +1287,7 @@ document.addEventListener("click", e=>{
 
 $("exportBtn").onclick = ()=>{
   const backup = {
-    version: 3,
+    version: 4,
     exportedAt: new Date().toISOString(),
     records: rows
   };
