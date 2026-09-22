@@ -78,6 +78,22 @@ button,input,textarea,select{font:inherit}
   outline:none;
 }
 .search:focus{border-color:var(--pink)}
+.toolbar-actions{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex:0 0 auto;
+}
+.backup-btn{
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:10px 13px;
+  background:#fff;
+  color:#596171;
+  font-weight:800;
+  cursor:pointer;
+}
+.backup-btn:hover{border-color:var(--pink);background:var(--pink-soft)}
 .add-btn{
   border:0;
   border-radius:14px;
@@ -255,6 +271,19 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
   }
   .brand{font-size:17px}
   .brand::before{width:29px;height:29px;margin-right:6px}
+  .toolbar{gap:8px}
+  .toolbar-actions{gap:6px}
+  .backup-btn{
+    width:38px;height:38px;padding:0;border-radius:12px;
+    font-size:0;position:relative;
+  }
+  .backup-btn::after{
+    font-size:15px;
+    position:absolute;inset:0;
+    display:grid;place-items:center;
+  }
+  #exportBtn::after{content:"↓"}
+  #importBtn::after{content:"↑"}
   .add-btn{
     width:42px;height:42px;padding:0;border-radius:13px;
     font-size:0;position:relative;flex:0 0 auto;
@@ -347,7 +376,12 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
   <div class="toolbar">
     <div class="brand">API 小记录</div>
     <input id="search" class="search" placeholder="搜索网站名或网址">
-    <button class="add-btn" id="addBtn">+ 添加</button>
+    <div class="toolbar-actions">
+      <button class="backup-btn" id="exportBtn" title="导出 JSON">导出</button>
+      <button class="backup-btn" id="importBtn" title="导入 JSON">导入</button>
+      <button class="add-btn" id="addBtn">+ 添加</button>
+    </div>
+    <input id="importFile" type="file" accept=".json,application/json" hidden>
   </div>
 
   <div class="table-wrap">
@@ -498,6 +532,56 @@ $("modal").addEventListener("click",e=>{ if(e.target===$("modal")) closeEditor()
 $("checkYes").onclick = ()=>setCheck(true);
 $("checkNo").onclick = ()=>setCheck(false);
 $("search").addEventListener("input",render);
+
+$("exportBtn").onclick = ()=>{
+  const backup = {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    records: rows
+  };
+  const blob = new Blob([JSON.stringify(backup, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const date = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = `api-site-record-backup-${date}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+};
+
+$("importBtn").onclick = ()=>$("importFile").click();
+
+$("importFile").addEventListener("change", async e=>{
+  const file = e.target.files?.[0];
+  e.target.value = "";
+  if(!file) return;
+
+  try{
+    const parsed = JSON.parse(await file.text());
+    const incoming = Array.isArray(parsed) ? parsed : parsed?.records;
+    if(!Array.isArray(incoming)) throw new Error("格式错误");
+
+    const normalized = incoming.map(item=>({
+      name: String(item?.name ?? "").trim() || "未命名",
+      url: String(item?.url ?? "").trim(),
+      check: Boolean(item?.check),
+      models: String(item?.models ?? "").trim(),
+      group: String(item?.group ?? "").trim()
+    }));
+
+    if(!confirm(`导入 ${normalized.length} 条记录并覆盖当前 ${rows.length} 条记录？`)) return;
+
+    rows = normalized;
+    $("search").value = "";
+    render();
+    alert("导入完成");
+  }catch(err){
+    alert("导入失败：请选择本网站导出的 JSON 备份文件。");
+  }
+});
+
 $("saveBtn").onclick = ()=>{
   const item = {
     name:$("name").value.trim() || "未命名",
