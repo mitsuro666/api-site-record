@@ -45,7 +45,7 @@ body.modal-open{
   border:1px solid rgba(234,223,216,.9);
   border-radius:28px;
   box-shadow:var(--shadow);
-  overflow:hidden;
+  overflow:visible;
 }
 .toolbar{
   display:flex;
@@ -55,6 +55,7 @@ body.modal-open{
   border-bottom:1px solid var(--line);
   background:rgba(255,255,255,.75);
   backdrop-filter: blur(10px);
+  border-radius:28px 28px 0 0;
 }
 .brand{
   font-weight:800;
@@ -180,7 +181,7 @@ td:last-child,th:last-child{border-right:none}
   border-radius:12px;
   overflow:visible;
   position:relative;
-  z-index:20;
+  z-index:200;
   font-size:13px;
   font-weight:800;
 }
@@ -275,7 +276,7 @@ td:last-child,th:last-child{border-right:none}
   position:absolute;
   left:0;
   top:calc(100% + 5px);
-  z-index:100;
+  z-index:300;
   width:max(100%, 300px);
   max-width:min(440px, calc(100vw - 32px));
   max-height:min(560px, calc(100vh - 170px));
@@ -577,6 +578,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
   padding:12px 18px 16px;
   font-size:12px;
   color:var(--muted);
+  border-radius:0 0 28px 28px;
 }
 @media (max-width:760px){
   body{background:#fff9f4}
@@ -587,7 +589,10 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
     min-height:100vh;
     box-shadow:none;
     border:0;
+    overflow:visible;
   }
+  .toolbar{border-radius:0}
+  .footer{border-radius:0}
   .toolbar{
     padding:12px;
     position:sticky;
