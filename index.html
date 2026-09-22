@@ -172,6 +172,130 @@ td:last-child,th:last-child{border-right:none}
   color:var(--muted);
   padding:38px 20px;
 }
+.record-head,
+.site-record{
+  display:grid;
+  grid-template-columns:minmax(150px,1.05fr) minmax(210px,1.45fr) minmax(0,2.25fr) 112px;
+}
+.record-head{
+  border-bottom:1px solid var(--line);
+  font-size:13px;
+  font-weight:800;
+}
+.record-head > div{
+  padding:13px 14px;
+  border-right:1px solid #f1e8e2;
+}
+.record-head > div:nth-child(1){background:var(--pink-soft)}
+.record-head > div:nth-child(2){background:var(--blue)}
+.record-head > div:nth-child(3){
+  background:linear-gradient(90deg,#ffeaf1 0 68%,#fff2c9 68%);
+}
+.record-head > div:nth-child(4){background:var(--cream);border-right:none}
+.record-list{display:grid;gap:8px;padding:8px;background:#fffaf7}
+.site-record{
+  background:#fffdfb;
+  border:1px solid var(--line);
+  border-radius:16px;
+  overflow:hidden;
+}
+.site-cell{
+  padding:14px;
+  border-right:1px solid #f1e8e2;
+  min-width:0;
+}
+.site-name{
+  font-weight:900;
+  font-size:15px;
+}
+.site-url a{
+  color:#4aa2dd;
+  text-decoration:none;
+  word-break:break-all;
+  font-size:12px;
+}
+.pair-list{
+  display:grid;
+  align-content:start;
+  border-right:1px solid #f1e8e2;
+}
+.pair-row{
+  display:grid;
+  grid-template-columns:minmax(0,2fr) minmax(110px,.9fr);
+  min-height:44px;
+  border-bottom:1px solid #f1e8e2;
+}
+.pair-row:last-child{border-bottom:none}
+.pair-model,
+.pair-price{
+  padding:11px 14px;
+  display:flex;
+  align-items:center;
+  min-width:0;
+}
+.pair-model{border-right:1px solid #f1e8e2;font-size:13px}
+.pair-price{font-weight:800;font-size:13px;background:#fffdf7}
+.pair-empty{color:var(--muted);font-weight:400}
+.site-controls{
+  padding:10px;
+  display:flex;
+  gap:6px;
+  align-items:flex-start;
+  justify-content:flex-end;
+}
+.more-btn{
+  width:34px;height:34px;
+  border:0;border-radius:11px;
+  background:#fff3d8;color:#9c761d;
+  cursor:pointer;
+  transition:.15s ease;
+}
+.more-btn.open{transform:rotate(180deg)}
+.site-extra{
+  grid-column:1/-1;
+  display:none;
+  gap:18px;
+  align-items:center;
+  padding:11px 14px;
+  border-top:1px solid var(--line);
+  background:#fffaf1;
+  font-size:12px;
+}
+.site-extra.open{display:flex}
+.extra-item{
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
+.extra-label{color:var(--muted);font-weight:800}
+.secondary-editor{
+  grid-column:1/-1;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:#fffaf5;
+  overflow:hidden;
+}
+.secondary-editor summary{
+  cursor:pointer;
+  padding:11px 12px;
+  font-size:12px;
+  font-weight:800;
+  color:#5a6271;
+  list-style:none;
+}
+.secondary-editor summary::-webkit-details-marker{display:none}
+.secondary-editor summary::after{
+  content:"⌄";
+  float:right;
+  color:var(--muted);
+}
+.secondary-editor[open] summary::after{content:"⌃"}
+.secondary-editor-body{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  padding:0 12px 12px;
+}
 .modal-backdrop{
   position:fixed;inset:0;
   background:rgba(50,40,50,.22);
@@ -308,58 +432,55 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
   }
   .add-btn::after{content:"+";font-size:24px;position:absolute;inset:0;display:grid;place-items:center}
   .search{padding:10px 11px}
-  .table-wrap{overflow:visible}
-  table,thead,tbody,tr,th,td{display:block}
-  table{min-width:0}
-  thead{display:none}
-  tbody{
+  .record-head{display:none}
+  .record-list{
     padding:10px;
-    display:grid;
     gap:10px;
+    background:transparent;
   }
-  tr{
-    position:relative;
-    border:1px solid var(--line);
+  .site-record{
+    display:grid;
+    grid-template-columns:1fr auto;
     border-radius:18px;
-    overflow:hidden;
-    background:white;
     box-shadow:0 6px 16px rgba(80,65,75,.05);
-    padding:12px 46px 12px 12px;
   }
-  td{
-    border:0!important;
-    background:transparent!important;
-    padding:4px 0;
+  .site-cell{
+    border-right:0;
+    padding:12px 12px 4px;
   }
-  td[data-label]::before{
-    content:attr(data-label);
-    display:inline-block;
-    width:86px;
-    color:var(--muted);
-    font-size:11px;
-    font-weight:800;
-    vertical-align:top;
-  }
-  td.name{
+  .site-name{
+    grid-column:1;
     font-size:16px;
-    font-weight:900;
-    padding-bottom:7px;
+    padding-right:4px;
   }
-  td.name::before{display:none}
-  td.url a{font-size:12px}
-  td.actions{
-    position:absolute;
-    top:10px;right:8px;
+  .site-url{
+    grid-column:1;
+    padding-top:2px;
+    padding-bottom:10px;
   }
-  .actions .del{display:none}
-  .icon-btn{
-    width:34px;height:34px;margin:0;
+  .pair-list{
+    grid-column:1/-1;
+    border-right:0;
+    border-top:1px solid var(--line);
   }
-  .models{
-    display:inline-flex;
-    width:calc(100% - 90px);
-    vertical-align:top;
+  .pair-row{
+    grid-template-columns:minmax(0,1fr) minmax(88px,.42fr);
+    min-height:42px;
   }
+  .pair-model,.pair-price{padding:10px 12px}
+  .site-controls{
+    grid-column:2;
+    grid-row:1 / span 2;
+    padding:10px 8px 0 0;
+    align-items:flex-start;
+  }
+  .site-controls .del{display:none}
+  .site-extra{
+    grid-column:1/-1;
+    flex-wrap:wrap;
+    padding:10px 12px;
+  }
+  .secondary-editor-body{grid-template-columns:1fr}
   .modal-backdrop{
     align-items:flex-end;
     padding:0;
@@ -407,22 +528,13 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
     <input id="importFile" type="file" accept=".json,application/json" hidden>
   </div>
 
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>网站名</th>
-          <th>网址</th>
-          <th>签到</th>
-          <th>主要模型</th>
-          <th>价格</th>
-          <th>官方群号</th>
-          <th>操作</th>
-        </tr>
-      </thead>
-      <tbody id="tbody"></tbody>
-    </table>
+  <div class="record-head">
+    <div>网站名</div>
+    <div>网址</div>
+    <div>主要模型　　　　　　　　　　　价格</div>
+    <div>操作</div>
   </div>
+  <div class="record-list" id="recordList"></div>
   <div class="footer" id="count"></div>
 </div>
 
@@ -441,22 +553,27 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
         <label>网址</label>
         <input id="url" placeholder="https://...">
       </div>
-      <div class="field">
-        <label>签到</label>
-        <div class="seg">
-          <button type="button" id="checkYes">有</button>
-          <button type="button" id="checkNo">无</button>
-        </div>
-      </div>
-      <div class="field">
-        <label>官方群号</label>
-        <input id="group" placeholder="例如：123456789">
-      </div>
       <div class="field full">
         <label>主要模型 / 价格</label>
         <div class="model-price-list" id="modelPriceList"></div>
         <button class="add-pair" type="button" id="addModelBtn">＋ 添加模型</button>
       </div>
+      <details class="secondary-editor">
+        <summary>签到 / 官方群号</summary>
+        <div class="secondary-editor-body">
+          <div class="field">
+            <label>签到</label>
+            <div class="seg">
+              <button type="button" id="checkYes">有</button>
+              <button type="button" id="checkNo">无</button>
+            </div>
+          </div>
+          <div class="field">
+            <label>官方群号</label>
+            <input id="group" placeholder="例如：123456789">
+          </div>
+        </div>
+      </details>
     </div>
     <button class="save" id="saveBtn">保存</button>
   </div>
@@ -528,7 +645,8 @@ let editingIndex = null;
 let checkValue = true;
 
 const $ = id => document.getElementById(id);
-const tbody = $("tbody");
+const recordList = $("recordList");
+const expandedRows = new Set();
 
 function esc(s=""){
   return s.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
@@ -539,28 +657,32 @@ function render(){
     .map((r,i)=>({...r,_i:i}))
     .filter(r => !q || r.name.toLowerCase().includes(q) || r.url.toLowerCase().includes(q));
 
-  tbody.innerHTML = filtered.length ? filtered.map(r => `
-    <tr>
-      <td class="name">${esc(r.name)}</td>
-      <td class="url" data-label="网址"><a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.url)}</a></td>
-      <td data-label="签到"><span class="badge ${r.check?'yes':'no'}">${r.check?'有':'无'}</span></td>
-      <td data-label="主要模型">
-        <div class="models">
-          ${(r.modelPrices || []).filter(x=>x.model).map(x=>`<span class="tag">${esc(x.model)}</span>`).join("")}
+  recordList.innerHTML = filtered.length ? filtered.map(r => {
+    const pairs = (r.modelPrices || []).length ? r.modelPrices : [{model:"",price:""}];
+    const pairHtml = pairs.map(x => `
+      <div class="pair-row">
+        <div class="pair-model ${x.model ? "" : "pair-empty"}">${esc(x.model || "—")}</div>
+        <div class="pair-price ${x.price ? "" : "pair-empty"}">${esc(x.price || "—")}</div>
+      </div>
+    `).join("");
+    const open = expandedRows.has(r._i);
+    return `
+      <div class="site-record">
+        <div class="site-cell site-name">${esc(r.name)}</div>
+        <div class="site-cell site-url"><a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.url)}</a></div>
+        <div class="pair-list">${pairHtml}</div>
+        <div class="site-controls">
+          <button class="more-btn ${open ? "open" : ""}" onclick="toggleExtra(${r._i})" title="展开更多">⌄</button>
+          <button class="icon-btn edit" onclick="editRow(${r._i})" title="编辑">✎</button>
+          <button class="icon-btn del" onclick="deleteRow(${r._i})" title="删除">×</button>
         </div>
-      </td>
-      <td data-label="价格">
-        <div class="models">
-          ${(r.modelPrices || []).map(x=>`<span class="tag">${esc(x.price || "—")}</span>`).join("")}
+        <div class="site-extra ${open ? "open" : ""}">
+          <div class="extra-item"><span class="extra-label">签到</span><span class="badge ${r.check?'yes':'no'}">${r.check?'有':'无'}</span></div>
+          <div class="extra-item"><span class="extra-label">官方群号</span><span>${esc(r.group || "—")}</span></div>
         </div>
-      </td>
-      <td data-label="官方群号">${esc(r.group)}</td>
-      <td class="actions">
-        <button class="icon-btn edit" onclick="editRow(${r._i})" title="编辑">✎</button>
-        <button class="icon-btn del" onclick="deleteRow(${r._i})" title="删除">×</button>
-      </td>
-    </tr>`).join("") :
-    `<tr><td colspan="7" class="empty">暂无条目</td></tr>`;
+      </div>
+    `;
+  }).join("") : `<div class="empty">暂无条目</div>`;
 
   $("count").textContent = `共 ${filtered.length} 条记录`;
   localStorage.setItem("api-records-demo", JSON.stringify(rows));
@@ -597,6 +719,8 @@ function openEditor(data=null,index=null){
   $("name").value = data?.name || "";
   $("url").value = data?.url || "";
   $("group").value = data?.group || "";
+  const secondary = document.querySelector(".secondary-editor");
+  if(secondary) secondary.open = false;
   $("modelPriceList").innerHTML = "";
   const pairs = data ? normalizeModelPrices(data) : [];
   (pairs.length ? pairs : [{model:"",price:""}]).forEach(addModelPriceRow);
@@ -606,6 +730,11 @@ function openEditor(data=null,index=null){
 }
 function closeEditor(){
   $("modal").classList.remove("open");
+}
+window.toggleExtra = function(i){
+  if(expandedRows.has(i)) expandedRows.delete(i);
+  else expandedRows.add(i);
+  render();
 }
 window.editRow = function(i){openEditor(rows[i],i)}
 window.deleteRow = function(i){
