@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>API 小记录</title>
+<style>
+:root{
+  --bg:#fff9f4;
+  --paper:#fffdf9;
+  --pink:#f7a9bd;
+  --pink-deep:#ef7fa0;
+  --pink-soft:#fde8ef;
+  --blue:#dff1ff;
+  --blue-deep:#8ec8ef;
+  --yellow:#fff0bd;
+  --cream:#fff6df;
+  --mint:#dff5e9;
+  --text:#2e3443;
+  --muted:#7f8796;
+  --line:#eadfd8;
+  --shadow:0 14px 40px rgba(110,85,95,.10);
+  --radius:20px;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family: ui-rounded, "SF Pro Rounded", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  background:
+    radial-gradient(circle at 10% 0%, #ffe5ed 0 16%, transparent 36%),
+    radial-gradient(circle at 100% 12%, #eaf5ff 0 14%, transparent 34%),
+    linear-gradient(135deg,#fffaf5,#fffdf9);
+  color:var(--text);
+  min-height:100vh;
+}
+button,input,textarea,select{font:inherit}
+.app{
+  width:min(1180px, calc(100% - 28px));
+  margin:26px auto;
+  background:rgba(255,253,249,.94);
+  border:1px solid rgba(234,223,216,.9);
+  border-radius:28px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+.toolbar{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  padding:18px;
+  border-bottom:1px solid var(--line);
+  background:rgba(255,255,255,.75);
+  backdrop-filter: blur(10px);
+}
+.brand{
+  font-weight:800;
+  font-size:22px;
+  letter-spacing:.02em;
+  white-space:nowrap;
+}
+.brand::before{
+  content:"♡";
+  display:inline-grid;
+  place-items:center;
+  width:34px;height:34px;
+  margin-right:8px;
+  border-radius:50%;
+  background:var(--pink-soft);
+  color:var(--pink-deep);
+}
+.search{
+  flex:1;
+  min-width:120px;
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:14px;
+  padding:11px 13px;
+  outline:none;
+}
+.search:focus{border-color:var(--pink)}
+.add-btn{
+  border:0;
+  border-radius:14px;
+  padding:11px 17px;
+  background:linear-gradient(135deg,var(--pink),var(--pink-deep));
+  color:white;
+  font-weight:800;
+  cursor:pointer;
+  box-shadow:0 7px 18px rgba(239,127,160,.22);
+}
+.table-wrap{overflow:auto}
+table{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0;
+  min-width:900px;
+}
+th,td{
+  padding:13px 14px;
+  border-bottom:1px solid var(--line);
+  border-right:1px solid #f1e8e2;
+  text-align:left;
+  vertical-align:top;
+  background:#fffdfb;
+}
+th{
+  position:sticky;
+  top:0;
+  z-index:2;
+  font-size:13px;
+  font-weight:800;
+}
+th:nth-child(1){background:var(--pink-soft)}
+th:nth-child(2){background:var(--blue)}
+th:nth-child(3){background:var(--yellow)}
+th:nth-child(4){background:#ffeaf1}
+th:nth-child(5){background:#e8f3ff}
+th:nth-child(6){background:var(--cream)}
+td:last-child,th:last-child{border-right:none}
+.url a{color:#4aa2dd;text-decoration:none;word-break:break-all}
+.badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:46px;
+  padding:5px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:800;
+}
+.badge.yes{background:var(--mint);color:#329866}
+.badge.no{background:#ffe0e7;color:#d85b7b}
+.models{
+  display:flex;flex-wrap:wrap;gap:6px;
+}
+.tag{
+  display:inline-block;
+  padding:5px 8px;
+  border-radius:9px;
+  background:#f7f8fb;
+  font-size:12px;
+  line-height:1.3;
+}
+.actions{white-space:nowrap}
+.icon-btn{
+  width:34px;height:34px;
+  border:0;border-radius:11px;
+  cursor:pointer;
+  margin-right:6px;
+}
+.edit{background:#e7f4ff;color:#2a92d5}
+.del{background:#ffe7ed;color:#e65f81}
+.empty{
+  text-align:center;
+  color:var(--muted);
+  padding:38px 20px;
+}
+.modal-backdrop{
+  position:fixed;inset:0;
+  background:rgba(50,40,50,.22);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  z-index:20;
+}
+.modal-backdrop.open{display:flex}
+.editor{
+  width:min(620px,100%);
+  max-height:90vh;
+  overflow:auto;
+  background:#fffdfb;
+  border-radius:22px;
+  box-shadow:0 24px 60px rgba(61,44,55,.18);
+  padding:18px;
+}
+.editor-head{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:12px;
+}
+.editor-title{font-size:18px;font-weight:900}
+.close-btn{
+  border:0;background:#f4f5f7;border-radius:10px;
+  width:36px;height:36px;cursor:pointer;
+}
+.form-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+.field{display:flex;flex-direction:column;gap:7px}
+.field.full{grid-column:1/-1}
+label{font-size:12px;font-weight:800;color:#5a6271}
+input,textarea,select{
+  width:100%;
+  border:1px solid var(--line);
+  background:white;
+  border-radius:12px;
+  padding:11px 12px;
+  outline:none;
+}
+textarea{resize:vertical;min-height:110px}
+input:focus,textarea:focus,select:focus{border-color:var(--pink)}
+.seg{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+.seg button{
+  border:1px solid var(--line);
+  background:#f7f7f8;
+  border-radius:12px;
+  padding:10px;
+  cursor:pointer;
+}
+.seg button.active{
+  background:var(--pink-soft);
+  border-color:var(--pink);
+  color:#c84f73;
+  font-weight:800;
+}
+.save{
+  width:100%;
+  margin-top:16px;
+  border:0;
+  border-radius:14px;
+  padding:12px;
+  color:white;
+  background:linear-gradient(135deg,var(--pink),var(--pink-deep));
+  font-weight:900;
+  cursor:pointer;
+}
+.hint{
+  font-size:11px;color:var(--muted);margin-top:4px;
+}
+.footer{
+  padding:12px 18px 16px;
+  font-size:12px;
+  color:var(--muted);
+}
+@media (max-width:760px){
+  body{background:#fff9f4}
+  .app{
+    width:100%;
+    margin:0;
+    border-radius:0;
+    min-height:100vh;
+    box-shadow:none;
+    border:0;
+  }
+  .toolbar{
+    padding:12px;
+    position:sticky;
+    top:0;z-index:5;
+  }
+  .brand{font-size:17px}
+  .brand::before{width:29px;height:29px;margin-right:6px}
+  .add-btn{
+    width:42px;height:42px;padding:0;border-radius:13px;
+    font-size:0;position:relative;flex:0 0 auto;
+  }
+  .add-btn::after{content:"+";font-size:24px;position:absolute;inset:0;display:grid;place-items:center}
+  .search{padding:10px 11px}
+  .table-wrap{overflow:visible}
+  table,thead,tbody,tr,th,td{display:block}
+  table{min-width:0}
+  thead{display:none}
+  tbody{
+    padding:10px;
+    display:grid;
+    gap:10px;
+  }
+  tr{
+    position:relative;
+    border:1px solid var(--line);
+    border-radius:18px;
+    overflow:hidden;
+    background:white;
+    box-shadow:0 6px 16px rgba(80,65,75,.05);
+    padding:12px 46px 12px 12px;
+  }
+  td{
+    border:0!important;
+    background:transparent!important;
+    padding:4px 0;
+  }
+  td[data-label]::before{
+    content:attr(data-label);
+    display:inline-block;
+    width:86px;
+    color:var(--muted);
+    font-size:11px;
+    font-weight:800;
+    vertical-align:top;
+  }
+  td.name{
+    font-size:16px;
+    font-weight:900;
+    padding-bottom:7px;
+  }
+  td.name::before{display:none}
+  td.url a{font-size:12px}
+  td.actions{
+    position:absolute;
+    top:10px;right:8px;
+  }
+  .actions .del{display:none}
+  .icon-btn{
+    width:34px;height:34px;margin:0;
+  }
+  .models{
+    display:inline-flex;
+    width:calc(100% - 90px);
+    vertical-align:top;
+  }
+  .modal-backdrop{
+    align-items:flex-end;
+    padding:0;
+  }
+  .editor{
+    width:100%;
+    max-height:88vh;
+    border-radius:22px 22px 0 0;
+    padding:18px 14px calc(16px + env(safe-area-inset-bottom));
+    animation:slideUp .18s ease-out;
+  }
+  .editor::before{
+    content:"";
+    display:block;
+    width:44px;height:5px;border-radius:999px;
+    background:#ddd4d0;
+    margin:-6px auto 12px;
+  }
+  .form-grid{grid-template-columns:1fr}
+  .field.full{grid-column:auto}
+  input,textarea,select{font-size:16px}
+  .save{padding:14px}
+  @keyframes slideUp{
+    from{transform:translateY(16px);opacity:.4}
+    to{transform:translateY(0);opacity:1}
+  }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="toolbar">
+    <div class="brand">API 小记录</div>
+    <input id="search" class="search" placeholder="搜索网站名或网址">
+    <button class="add-btn" id="addBtn">+ 添加</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>网站名</th>
+          <th>网址</th>
+          <th>签到</th>
+          <th>主要模型与价格</th>
+          <th>官方群号</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+  <div class="footer" id="count"></div>
+</div>
+
+<div class="modal-backdrop" id="modal">
+  <div class="editor">
+    <div class="editor-head">
+      <div class="editor-title" id="editorTitle">添加条目</div>
+      <button class="close-btn" id="closeBtn">×</button>
+    </div>
+    <div class="form-grid">
+      <div class="field">
+        <label>网站名</label>
+        <input id="name" placeholder="例如：OpenAI">
+      </div>
+      <div class="field">
+        <label>网址</label>
+        <input id="url" placeholder="https://...">
+      </div>
+      <div class="field">
+        <label>签到</label>
+        <div class="seg">
+          <button type="button" id="checkYes">有</button>
+          <button type="button" id="checkNo">无</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>官方群号</label>
+        <input id="group" placeholder="例如：123456789">
+      </div>
+      <div class="field full">
+        <label>主要模型与价格</label>
+        <textarea id="models" placeholder="一行一个，更适合手机输入&#10;例如：&#10;GPT-5.6 Sol｜$X / 1M tokens&#10;Claude Sonnet｜$X / 1M tokens"></textarea>
+        <div class="hint">每行会自动显示成一个小标签，避免表格里塞成一条很长的文字。</div>
+      </div>
+    </div>
+    <button class="save" id="saveBtn">保存</button>
+  </div>
+</div>
+
+<script>
+const seed = [
+  {
+    name:"OpenAI",
+    url:"https://openai.com",
+    check:true,
+    models:"GPT-5.6 Sol｜价格待记录\nGPT-5.6 Luna｜价格待记录",
+    group:"123456"
+  },
+  {
+    name:"Anthropic",
+    url:"https://anthropic.com",
+    check:false,
+    models:"Claude Sonnet｜价格待记录\nClaude Opus｜价格待记录",
+    group:"234567"
+  },
+  {
+    name:"Google AI",
+    url:"https://ai.google.dev",
+    check:true,
+    models:"Gemini 2.5 Pro｜价格待记录\nGemini Flash｜价格待记录",
+    group:"345678"
+  }
+];
+
+let rows = JSON.parse(localStorage.getItem("api-records-demo") || "null") || seed;
+let editingIndex = null;
+let checkValue = true;
+
+const $ = id => document.getElementById(id);
+const tbody = $("tbody");
+
+function esc(s=""){
+  return s.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+}
+function render(){
+  const q = $("search").value.trim().toLowerCase();
+  const filtered = rows
+    .map((r,i)=>({...r,_i:i}))
+    .filter(r => !q || r.name.toLowerCase().includes(q) || r.url.toLowerCase().includes(q));
+
+  tbody.innerHTML = filtered.length ? filtered.map(r => `
+    <tr>
+      <td class="name">${esc(r.name)}</td>
+      <td class="url" data-label="网址"><a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.url)}</a></td>
+      <td data-label="签到"><span class="badge ${r.check?'yes':'no'}">${r.check?'有':'无'}</span></td>
+      <td data-label="模型与价格">
+        <div class="models">
+          ${esc(r.models).split("\n").filter(Boolean).map(x=>`<span class="tag">${x}</span>`).join("")}
+        </div>
+      </td>
+      <td data-label="官方群号">${esc(r.group)}</td>
+      <td class="actions">
+        <button class="icon-btn edit" onclick="editRow(${r._i})" title="编辑">✎</button>
+        <button class="icon-btn del" onclick="deleteRow(${r._i})" title="删除">×</button>
+      </td>
+    </tr>`).join("") :
+    `<tr><td colspan="6" class="empty">暂无条目</td></tr>`;
+
+  $("count").textContent = `共 ${filtered.length} 条记录`;
+  localStorage.setItem("api-records-demo", JSON.stringify(rows));
+}
+function setCheck(v){
+  checkValue = v;
+  $("checkYes").classList.toggle("active", v);
+  $("checkNo").classList.toggle("active", !v);
+}
+function openEditor(data=null,index=null){
+  editingIndex = index;
+  $("editorTitle").textContent = index===null ? "添加条目" : "编辑条目";
+  $("name").value = data?.name || "";
+  $("url").value = data?.url || "";
+  $("group").value = data?.group || "";
+  $("models").value = data?.models || "";
+  setCheck(data?.check ?? true);
+  $("modal").classList.add("open");
+  setTimeout(()=>$("name").focus(),50);
+}
+function closeEditor(){
+  $("modal").classList.remove("open");
+}
+window.editRow = function(i){openEditor(rows[i],i)}
+window.deleteRow = function(i){
+  if(confirm("删除这条记录？")){
+    rows.splice(i,1);
+    render();
+  }
+}
+$("addBtn").onclick = ()=>openEditor();
+$("closeBtn").onclick = closeEditor;
+$("modal").addEventListener("click",e=>{ if(e.target===$("modal")) closeEditor(); });
+$("checkYes").onclick = ()=>setCheck(true);
+$("checkNo").onclick = ()=>setCheck(false);
+$("search").addEventListener("input",render);
+$("saveBtn").onclick = ()=>{
+  const item = {
+    name:$("name").value.trim() || "未命名",
+    url:$("url").value.trim(),
+    check:checkValue,
+    models:$("models").value.trim(),
+    group:$("group").value.trim()
+  };
+  if(editingIndex===null) rows.unshift(item);
+  else rows[editingIndex]=item;
+  closeEditor();
+  render();
+};
+render();
+</script>
+</body>
+</html>
