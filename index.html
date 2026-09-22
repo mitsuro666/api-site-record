@@ -109,7 +109,7 @@ table{
   width:100%;
   border-collapse:separate;
   border-spacing:0;
-  min-width:900px;
+  min-width:1040px;
 }
 th,td{
   padding:13px 14px;
@@ -130,8 +130,9 @@ th:nth-child(1){background:var(--pink-soft)}
 th:nth-child(2){background:var(--blue)}
 th:nth-child(3){background:var(--yellow)}
 th:nth-child(4){background:#ffeaf1}
-th:nth-child(5){background:#e8f3ff}
-th:nth-child(6){background:var(--cream)}
+th:nth-child(5){background:#fff2c9}
+th:nth-child(6){background:#e8f3ff}
+th:nth-child(7){background:var(--cream)}
 td:last-child,th:last-child{border-right:none}
 .url a{color:#4aa2dd;text-decoration:none;word-break:break-all}
 .badge{
@@ -249,6 +250,23 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
 .hint{
   font-size:11px;color:var(--muted);margin-top:4px;
 }
+.model-price-list{display:grid;gap:8px}
+.model-price-row{
+  display:grid;
+  grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) 38px;
+  gap:8px;
+  align-items:center;
+}
+.model-price-row select,.model-price-row input{min-width:0}
+.remove-pair{
+  width:38px;height:38px;border:0;border-radius:11px;
+  background:#ffe7ed;color:#d95f80;cursor:pointer;font-weight:900;
+}
+.add-pair{
+  margin-top:8px;border:1px dashed var(--pink);border-radius:12px;
+  background:var(--pink-soft);color:#c84f73;padding:9px 12px;
+  font-weight:800;cursor:pointer;
+}
 .footer{
   padding:12px 18px 16px;
   font-size:12px;
@@ -363,6 +381,11 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
   .form-grid{grid-template-columns:1fr}
   .field.full{grid-column:auto}
   input,textarea,select{font-size:16px}
+  .model-price-row{grid-template-columns:minmax(0,1fr) 38px}
+  .model-price-row .price-input{grid-column:1 / 2}
+  .model-price-row .remove-pair{
+    grid-column:2;grid-row:1 / span 2;height:100%;min-height:82px;
+  }
   .save{padding:14px}
   @keyframes slideUp{
     from{transform:translateY(16px);opacity:.4}
@@ -391,7 +414,8 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
           <th>网站名</th>
           <th>网址</th>
           <th>签到</th>
-          <th>主要模型与价格</th>
+          <th>主要模型</th>
+          <th>价格</th>
           <th>官方群号</th>
           <th>操作</th>
         </tr>
@@ -429,9 +453,9 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
         <input id="group" placeholder="例如：123456789">
       </div>
       <div class="field full">
-        <label>主要模型与价格</label>
-        <textarea id="models" placeholder="一行一个，更适合手机输入&#10;例如：&#10;GPT-5.6 Sol｜$X / 1M tokens&#10;Claude Sonnet｜$X / 1M tokens"></textarea>
-        <div class="hint">每行会自动显示成一个小标签，避免表格里塞成一条很长的文字。</div>
+        <label>主要模型 / 价格</label>
+        <div class="model-price-list" id="modelPriceList"></div>
+        <button class="add-pair" type="button" id="addModelBtn">＋ 添加模型</button>
       </div>
     </div>
     <button class="save" id="saveBtn">保存</button>
@@ -439,31 +463,67 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
 </div>
 
 <script>
-const seed = [
-  {
-    name:"OpenAI",
-    url:"https://openai.com",
-    check:true,
-    models:"GPT-5.6 Sol｜价格待记录\nGPT-5.6 Luna｜价格待记录",
-    group:"123456"
-  },
-  {
-    name:"Anthropic",
-    url:"https://anthropic.com",
-    check:false,
-    models:"Claude Sonnet｜价格待记录\nClaude Opus｜价格待记录",
-    group:"234567"
-  },
-  {
-    name:"Google AI",
-    url:"https://ai.google.dev",
-    check:true,
-    models:"Gemini 2.5 Pro｜价格待记录\nGemini Flash｜价格待记录",
-    group:"345678"
-  }
+const MODEL_OPTIONS = [
+  "claude-opus-4-8",
+  "claude-opus-5",
+  "deepseek-v4-flash",
+  "deepseek-v4-pro",
+  "deepseek-v4.1-flash",
+  "gemini-3.1-pro-preview",
+  "gemini-3.5-flash",
+  "gemini-3.6-flash",
+  "gemini-3.7-flash",
+  "gemini-3.8-flash",
+  "glm-5.3",
+  "gpt-4o-2024-11-20",
+  "gpt-4.1",
+  "gpt-5.5",
+  "gpt-5.6-sol",
+  "grok-4.7",
+  "kimi-k3"
 ];
 
-let rows = JSON.parse(localStorage.getItem("api-records-demo") || "null") || seed;
+const seed = [
+  {name:"OpenAI",url:"https://openai.com",check:true,modelPrices:[
+    {model:"gpt-4o-2024-11-20",price:"价格待记录"},
+    {model:"gpt-5.6-sol",price:"价格待记录"}
+  ],group:"123456"},
+  {name:"Anthropic",url:"https://anthropic.com",check:false,modelPrices:[
+    {model:"claude-opus-4-8",price:"价格待记录"},
+    {model:"claude-opus-5",price:"价格待记录"}
+  ],group:"234567"},
+  {name:"Google AI",url:"https://ai.google.dev",check:true,modelPrices:[
+    {model:"gemini-3.1-pro-preview",price:"价格待记录"},
+    {model:"gemini-3.5-flash",price:"价格待记录"}
+  ],group:"345678"}
+]
+
+function normalizeModelPrices(item){
+  if(Array.isArray(item?.modelPrices)){
+    return item.modelPrices.map(x=>({
+      model:String(x?.model ?? "").trim(),
+      price:String(x?.price ?? "").trim()
+    })).filter(x=>x.model || x.price);
+  }
+  if(typeof item?.models === "string" && item.models.trim()){
+    return item.models.split("\n").filter(Boolean).map(line=>{
+      const parts = line.split(/｜|\|/);
+      return {model:(parts.shift() || "").trim(),price:parts.join("｜").trim()};
+    });
+  }
+  return [];
+}
+function normalizeRecord(item){
+  return {
+    name:String(item?.name ?? "").trim() || "未命名",
+    url:String(item?.url ?? "").trim(),
+    check:Boolean(item?.check),
+    modelPrices:normalizeModelPrices(item),
+    group:String(item?.group ?? "").trim()
+  };
+}
+const stored = JSON.parse(localStorage.getItem("api-records-demo") || "null");
+let rows = Array.isArray(stored) ? stored.map(normalizeRecord) : seed;
 let editingIndex = null;
 let checkValue = true;
 
@@ -484,9 +544,14 @@ function render(){
       <td class="name">${esc(r.name)}</td>
       <td class="url" data-label="网址"><a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.url)}</a></td>
       <td data-label="签到"><span class="badge ${r.check?'yes':'no'}">${r.check?'有':'无'}</span></td>
-      <td data-label="模型与价格">
+      <td data-label="主要模型">
         <div class="models">
-          ${esc(r.models).split("\n").filter(Boolean).map(x=>`<span class="tag">${x}</span>`).join("")}
+          ${(r.modelPrices || []).filter(x=>x.model).map(x=>`<span class="tag">${esc(x.model)}</span>`).join("")}
+        </div>
+      </td>
+      <td data-label="价格">
+        <div class="models">
+          ${(r.modelPrices || []).map(x=>`<span class="tag">${esc(x.price || "—")}</span>`).join("")}
         </div>
       </td>
       <td data-label="官方群号">${esc(r.group)}</td>
@@ -495,7 +560,7 @@ function render(){
         <button class="icon-btn del" onclick="deleteRow(${r._i})" title="删除">×</button>
       </td>
     </tr>`).join("") :
-    `<tr><td colspan="6" class="empty">暂无条目</td></tr>`;
+    `<tr><td colspan="7" class="empty">暂无条目</td></tr>`;
 
   $("count").textContent = `共 ${filtered.length} 条记录`;
   localStorage.setItem("api-records-demo", JSON.stringify(rows));
@@ -505,13 +570,36 @@ function setCheck(v){
   $("checkYes").classList.toggle("active", v);
   $("checkNo").classList.toggle("active", !v);
 }
+function modelOptionsHtml(selected=""){
+  const base = '<option value="">选择模型</option>';
+  return base + MODEL_OPTIONS.map(m=>`<option value="${esc(m)}" ${m===selected?"selected":""}>${esc(m)}</option>`).join("");
+}
+function addModelPriceRow(item={model:"",price:""}){
+  const wrap = document.createElement("div");
+  wrap.className = "model-price-row";
+  wrap.innerHTML = `
+    <select class="model-select">${modelOptionsHtml(item.model || "")}</select>
+    <input class="price-input" placeholder="价格" value="${esc(item.price || "")}">
+    <button class="remove-pair" type="button" title="删除">×</button>
+  `;
+  wrap.querySelector(".remove-pair").onclick = ()=>wrap.remove();
+  $("modelPriceList").appendChild(wrap);
+}
+function getEditorModelPrices(){
+  return [...$("modelPriceList").querySelectorAll(".model-price-row")].map(row=>({
+    model:row.querySelector(".model-select").value.trim(),
+    price:row.querySelector(".price-input").value.trim()
+  })).filter(x=>x.model || x.price);
+}
 function openEditor(data=null,index=null){
   editingIndex = index;
   $("editorTitle").textContent = index===null ? "添加条目" : "编辑条目";
   $("name").value = data?.name || "";
   $("url").value = data?.url || "";
   $("group").value = data?.group || "";
-  $("models").value = data?.models || "";
+  $("modelPriceList").innerHTML = "";
+  const pairs = data ? normalizeModelPrices(data) : [];
+  (pairs.length ? pairs : [{model:"",price:""}]).forEach(addModelPriceRow);
   setCheck(data?.check ?? true);
   $("modal").classList.add("open");
   setTimeout(()=>$("name").focus(),50);
@@ -531,11 +619,12 @@ $("closeBtn").onclick = closeEditor;
 $("modal").addEventListener("click",e=>{ if(e.target===$("modal")) closeEditor(); });
 $("checkYes").onclick = ()=>setCheck(true);
 $("checkNo").onclick = ()=>setCheck(false);
+$("addModelBtn").onclick = ()=>addModelPriceRow();
 $("search").addEventListener("input",render);
 
 $("exportBtn").onclick = ()=>{
   const backup = {
-    version: 1,
+    version: 2,
     exportedAt: new Date().toISOString(),
     records: rows
   };
@@ -563,13 +652,7 @@ $("importFile").addEventListener("change", async e=>{
     const incoming = Array.isArray(parsed) ? parsed : parsed?.records;
     if(!Array.isArray(incoming)) throw new Error("格式错误");
 
-    const normalized = incoming.map(item=>({
-      name: String(item?.name ?? "").trim() || "未命名",
-      url: String(item?.url ?? "").trim(),
-      check: Boolean(item?.check),
-      models: String(item?.models ?? "").trim(),
-      group: String(item?.group ?? "").trim()
-    }));
+    const normalized = incoming.map(normalizeRecord);
 
     if(!confirm(`导入 ${normalized.length} 条记录并覆盖当前 ${rows.length} 条记录？`)) return;
 
@@ -587,7 +670,7 @@ $("saveBtn").onclick = ()=>{
     name:$("name").value.trim() || "未命名",
     url:$("url").value.trim(),
     check:checkValue,
-    models:$("models").value.trim(),
+    modelPrices:getEditorModelPrices(),
     group:$("group").value.trim()
   };
   if(editingIndex===null) rows.unshift(item);
