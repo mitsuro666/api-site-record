@@ -228,18 +228,28 @@ td:last-child,th:last-child{border-right:none}
 .record-head > div:nth-child(3){background:#ffeaf1}
 .record-head > div:nth-child(4){background:#fff2c9}
 .record-head > div:nth-child(5){background:var(--cream);border-right:none}
-.record-list{display:grid;gap:8px;padding:8px;background:#fffaf7}
+.record-list{
+  display:grid;
+  gap:12px;
+  padding:10px 8px 8px;
+  background:#fffaf7;
+}
 .site-record{
   background:#fffdfb;
   border:1px solid var(--line);
   border-radius:16px;
   overflow:hidden;
+  box-shadow:0 4px 14px rgba(80,65,75,.035);
 }
-.site-cell{
-  padding:14px;
-  border-right:1px solid #f1e8e2;
-  min-width:0;
-  align-self:stretch;
+.site-summary{
+  display:grid;
+  grid-template-columns:minmax(180px,.95fr) minmax(260px,1.55fr) auto;
+  gap:16px;
+  align-items:center;
+  min-height:58px;
+  padding:11px 14px;
+  border-bottom:1px solid var(--line);
+  background:linear-gradient(90deg,#fffafd 0%,#fffdfb 55%,#fffdf7 100%);
 }
 .site-name{
   font-weight:900;
@@ -248,6 +258,7 @@ td:last-child,th:last-child{border-right:none}
   align-items:center;
   gap:8px;
   flex-wrap:wrap;
+  min-width:0;
 }
 .mini-check{
   display:inline-flex;
@@ -263,40 +274,75 @@ td:last-child,th:last-child{border-right:none}
 }
 .mini-check.yes{background:var(--mint);color:#329866}
 .mini-check.no{background:#ffe0e7;color:#d85b7b}
+.site-url{
+  min-width:0;
+}
 .site-url a{
   color:#4aa2dd;
   text-decoration:none;
   word-break:break-all;
   font-size:12px;
 }
-.record-cell{
-  min-width:0;
-  padding:11px 14px;
+.site-controls{
+  display:flex;
+  flex-direction:row;
+  gap:8px;
+  align-items:center;
+  justify-content:flex-end;
+}
+.model-table{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(120px,180px);
+}
+.model-table-head{
+  padding:8px 14px;
+  font-size:11px;
+  font-weight:900;
+  color:#687080;
+  border-bottom:1px solid var(--line);
+}
+.model-table-head.model-head{
+  background:#fff4f7;
   border-right:1px solid #f1e8e2;
-  border-bottom:1px solid #f1e8e2;
+}
+.model-table-head.price-head{
+  background:#fff7d9;
+}
+.model-cell,
+.price-cell{
+  min-width:0;
+  min-height:42px;
+  padding:10px 14px;
   display:flex;
   align-items:center;
+  border-bottom:1px solid #f1e8e2;
 }
 .model-cell{
   font-size:13px;
+  border-right:1px solid #f1e8e2;
 }
 .price-cell{
   font-size:13px;
   font-weight:800;
   background:#fffdf7;
 }
-.record-cell.last-row{border-bottom:none}
-.pair-empty{color:var(--muted);font-weight:400}
-.site-controls{
-  grid-column:5;
-  padding:10px;
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-  align-items:center;
-  justify-content:flex-start;
-  background:#fffdfb;
+.model-cell.last-row,
+.price-cell.last-row{
+  border-bottom:none;
 }
+.pair-empty{color:var(--muted);font-weight:400}
+.model-toggle{
+  grid-column:1/-1;
+  height:36px;
+  border:0;
+  border-top:1px solid var(--line);
+  background:#fffaf4;
+  color:#9b6a78;
+  font-size:11px;
+  font-weight:800;
+  cursor:pointer;
+}
+.model-toggle:hover{background:#fff4ef}
 .modal-backdrop{
   position:fixed;inset:0;
   background:rgba(50,40,50,.22);
@@ -473,45 +519,38 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
   }
   .site-record{
     position:relative;
-    display:grid;
-    grid-template-columns:minmax(0,1fr) minmax(88px,.42fr);
     border-radius:18px;
     box-shadow:0 6px 16px rgba(80,65,75,.05);
   }
-  .site-cell{
-    border-right:0;
-    padding:12px 12px 4px;
+  .site-summary{
+    display:block;
+    min-height:78px;
+    padding:12px 96px 10px 12px;
+    background:#fffdfb;
   }
   .site-name{
-    grid-column:1/-1!important;
-    grid-row:auto!important;
     font-size:16px;
-    padding-right:96px;
+    margin-bottom:5px;
   }
-  .site-url{
-    grid-column:1/-1!important;
-    grid-row:auto!important;
-    padding-top:2px;
-    padding-bottom:10px;
-    padding-right:96px;
+  .site-url a{
+    font-size:12px;
   }
-  .model-cell,
-  .price-cell{
-    grid-row:auto!important;
-    min-height:42px;
-    border-top:1px solid var(--line);
-    border-bottom:none;
-    padding:10px 12px;
-  }
-  .model-cell{grid-column:1!important}
-  .price-cell{grid-column:2!important;border-right:none}
   .site-controls{
     position:absolute;
     top:10px;
     right:8px;
-    padding:0;
-    flex-direction:row;
-    background:transparent;
+    gap:6px;
+  }
+  .model-table{
+    grid-template-columns:minmax(0,1fr) minmax(88px,.42fr);
+  }
+  .model-table-head{
+    padding:7px 12px;
+  }
+  .model-cell,
+  .price-cell{
+    min-height:42px;
+    padding:10px 12px;
   }
   .site-controls .del{display:inline-grid}
   .modal-backdrop{
@@ -729,6 +768,8 @@ let checkValue = true;
 
 const $ = id => document.getElementById(id);
 const recordList = $("recordList");
+const expandedSites = new Set();
+const COLLAPSED_MODEL_LIMIT = 7;
 
 const filterState = {
   site:"",
@@ -833,27 +874,45 @@ function render(){
       });
     }
 
-    const rowSpan = pairs.length;
-    const pairHtml = pairs.map((x,idx) => `
-      <div class="record-cell model-cell ${x.model ? "" : "pair-empty"} ${idx===rowSpan-1 ? "last-row" : ""}"
-           style="grid-column:3;grid-row:${idx+1}">${esc(x.model || "—")}</div>
-      <div class="record-cell price-cell ${x.price ? "" : "pair-empty"} ${idx===rowSpan-1 ? "last-row" : ""}"
-           style="grid-column:4;grid-row:${idx+1}">${esc(x.price || "—")}</div>
-    `).join("");
+    const canCollapse = !filterState.model && pairs.length > COLLAPSED_MODEL_LIMIT;
+    const isExpanded = expandedSites.has(r._i);
+    const shownPairs = canCollapse && !isExpanded
+      ? pairs.slice(0, COLLAPSED_MODEL_LIMIT)
+      : pairs;
+
+    const pairHtml = shownPairs.map((x,idx) => {
+      const isLast = idx===shownPairs.length-1 && !canCollapse;
+      return `
+        <div class="model-cell ${x.model ? "" : "pair-empty"} ${isLast ? "last-row" : ""}">${esc(x.model || "—")}</div>
+        <div class="price-cell ${x.price ? "" : "pair-empty"} ${isLast ? "last-row" : ""}">${esc(x.price || "—")}</div>
+      `;
+    }).join("");
+
+    const toggleHtml = canCollapse
+      ? `<button class="model-toggle" type="button" onclick="toggleSiteModels(${r._i})">${isExpanded ? "收起模型" : `展开其余 ${pairs.length-COLLAPSED_MODEL_LIMIT} 个模型`}</button>`
+      : "";
 
     return `
       <div class="site-record">
-        <div class="site-cell site-name" style="grid-column:1;grid-row:1 / span ${rowSpan}">
-          <span>${esc(r.name)}</span>
-          <span class="mini-check ${r.check?'yes':'no'}">${r.check?'有':'无'}</span>
+        <div class="site-summary">
+          <div class="site-name">
+            <span>${esc(r.name)}</span>
+            <span class="mini-check ${r.check?'yes':'no'}">${r.check?'有':'无'}</span>
+          </div>
+          <div class="site-url">
+            <a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.url)}</a>
+          </div>
+          <div class="site-controls">
+            <button class="icon-btn edit" onclick="editRow(${r._i})" title="编辑">✎</button>
+            <button class="icon-btn del" onclick="deleteRow(${r._i})" title="删除">×</button>
+          </div>
         </div>
-        <div class="site-cell site-url" style="grid-column:2;grid-row:1 / span ${rowSpan}">
-          <a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.url)}</a>
-        </div>
-        ${pairHtml}
-        <div class="site-controls" style="grid-row:1 / span ${rowSpan}">
-          <button class="icon-btn edit" onclick="editRow(${r._i})" title="编辑">✎</button>
-          <button class="icon-btn del" onclick="deleteRow(${r._i})" title="删除">×</button>
+
+        <div class="model-table">
+          <div class="model-table-head model-head">主要模型</div>
+          <div class="model-table-head price-head">价格</div>
+          ${pairHtml}
+          ${toggleHtml}
         </div>
       </div>
     `;
@@ -928,10 +987,16 @@ function openEditor(data=null,index=null){
 function closeEditor(){
   $("modal").classList.remove("open");
 }
+window.toggleSiteModels = function(i){
+  if(expandedSites.has(i)) expandedSites.delete(i);
+  else expandedSites.add(i);
+  render();
+}
 window.editRow = function(i){openEditor(rows[i],i)}
 window.deleteRow = function(i){
   if(confirm("删除这条记录？")){
     rows.splice(i,1);
+    expandedSites.clear();
     render();
   }
 }
@@ -995,6 +1060,7 @@ $("importFile").addEventListener("change", async e=>{
     if(!confirm(`导入 ${normalized.length} 条记录并覆盖当前 ${rows.length} 条记录？`)) return;
 
     rows = normalized;
+    expandedSites.clear();
     render();
     alert("导入完成");
   }catch(err){
@@ -1011,6 +1077,7 @@ $("saveBtn").onclick = ()=>{
   };
   if(editingIndex===null) rows.unshift(item);
   else rows[editingIndex]=item;
+  expandedSites.clear();
   closeEditor();
   render();
 };
