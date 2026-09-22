@@ -276,9 +276,12 @@ td:last-child,th:last-child{border-right:none}
   left:0;
   top:calc(100% + 5px);
   z-index:100;
-  width:max(100%, 240px);
-  max-height:260px;
+  width:max(100%, 300px);
+  max-width:min(440px, calc(100vw - 32px));
+  max-height:min(560px, calc(100vh - 170px));
   overflow:auto;
+  overscroll-behavior:contain;
+  scrollbar-gutter:stable;
   padding:7px;
   background:#fff;
   border:1px solid var(--line);
@@ -301,7 +304,12 @@ td:last-child,th:last-child{border-right:none}
   width:15px;
   height:15px;
   margin:0;
+  flex:0 0 auto;
   accent-color:var(--pink-deep);
+}
+.multi-option span{
+  min-width:0;
+  overflow-wrap:anywhere;
 }
 .multi-empty{
   padding:9px 8px;
@@ -636,8 +644,9 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
     font-size:12px;
   }
   .mobile-filters .multi-options{
-    width:min(300px, calc(100vw - 24px));
-    max-height:300px;
+    width:min(340px, calc(100vw - 24px));
+    max-width:calc(100vw - 24px);
+    max-height:min(62vh, 520px);
   }
   .mobile-filters .wide{grid-column:1/-1}
   .mobile-filters button{
