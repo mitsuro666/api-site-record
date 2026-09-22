@@ -172,7 +172,7 @@ td:last-child,th:last-child{border-right:none}
 }
 .record-head{
   display:grid;
-  grid-template-columns:minmax(180px,1fr) minmax(110px,.55fr) minmax(240px,1.35fr) minmax(240px,1.15fr) 110px;
+  grid-template-columns:minmax(180px,1.05fr) minmax(90px,.48fr) minmax(300px,1.75fr) minmax(140px,.78fr) minmax(160px,.95fr) 110px;
 }
 .record-head{
   margin:8px 8px 0;
@@ -222,15 +222,9 @@ td:last-child,th:last-child{border-right:none}
   outline:none;
 }
 .head-select:focus{border-color:var(--pink)}
-.price-filter-tools{
-  display:flex;
-  gap:6px;
-  min-width:0;
-}
-.price-filter-tools .head-select{flex:1}
 .head-search{
-  width:108px;
-  min-width:86px;
+  width:100%;
+  min-width:0;
   height:30px;
   border:1px solid rgba(160,140,145,.18);
   background:rgba(255,255,255,.78);
@@ -334,7 +328,8 @@ td:last-child,th:last-child{border-right:none}
 .record-head > div:nth-child(2){background:var(--blue)}
 .record-head > div:nth-child(3){background:#ffeaf1}
 .record-head > div:nth-child(4){background:#fff2c9}
-.record-head > div:nth-child(5){background:var(--cream);border-right:none}
+.record-head > div:nth-child(5){background:#eef8ff}
+.record-head > div:nth-child(6){background:var(--cream);border-right:none}
 .record-list{
   display:grid;
   gap:12px;
@@ -795,14 +790,15 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
     </div>
     <div class="head-cell">
       <div class="head-label">价格</div>
-      <div class="price-filter-tools">
-        <select class="head-select filter-control" data-filter="priceSort">
-          <option value="none">默认顺序</option>
-          <option value="asc">价格低→高</option>
-          <option value="desc">价格高→低</option>
-        </select>
-        <input class="head-search text-search" type="search" placeholder="搜索">
-      </div>
+      <select class="head-select filter-control" data-filter="priceSort">
+        <option value="none">默认顺序</option>
+        <option value="asc">价格低→高</option>
+        <option value="desc">价格高→低</option>
+      </select>
+    </div>
+    <div class="head-cell">
+      <div class="head-label">搜索</div>
+      <input class="head-search text-search" type="search" placeholder="任意文本">
     </div>
     <div class="head-cell">
       <div class="head-label">操作</div>
