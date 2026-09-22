@@ -34,6 +34,10 @@ body{
   min-height:100vh;
 }
 button,input,textarea,select{font:inherit}
+body.modal-open{
+  overflow:hidden;
+  overscroll-behavior:none;
+}
 .app{
   width:min(1180px, calc(100% - 28px));
   margin:26px auto;
@@ -912,6 +916,19 @@ function renderMultiOptions(kind, values){
     summary.textContent = multiSummaryText(kind);
   });
 }
+function syncMultiFilterUI(kind){
+  const selected = filterState[kind];
+  document.querySelectorAll(`[data-multi-kind="${kind}"]`).forEach(input=>{
+    input.checked = selected.includes(input.value);
+  });
+  document.querySelectorAll(`[data-multi-summary="${kind}"]`).forEach(summary=>{
+    summary.textContent = multiSummaryText(kind);
+  });
+}
+function syncSimpleFilterUI(){
+  document.querySelectorAll('[data-filter="check"]').forEach(el=>el.value=filterState.check);
+  document.querySelectorAll('[data-filter="priceSort"]').forEach(el=>el.value=filterState.priceSort);
+}
 function refreshFilterOptions(){
   const siteNames = [...new Set(rows.map(r=>r.name).filter(Boolean))]
     .sort((a,b)=>a.localeCompare(b,"zh-CN"));
@@ -925,12 +942,15 @@ function refreshFilterOptions(){
 
   renderMultiOptions("sites", siteNames);
   renderMultiOptions("models", modelNames);
-
-  document.querySelectorAll('[data-filter="check"]').forEach(el=>el.value=filterState.check);
-  document.querySelectorAll('[data-filter="priceSort"]').forEach(el=>el.value=filterState.priceSort);
+  syncSimpleFilterUI();
 }
-function render(){
-  refreshFilterOptions();
+function render(refreshFilters=true){
+  if(refreshFilters) refreshFilterOptions();
+  else{
+    syncMultiFilterUI("sites");
+    syncMultiFilterUI("models");
+    syncSimpleFilterUI();
+  }
 
   let filtered = rows
     .map((r,i)=>({
@@ -1077,10 +1097,12 @@ function openEditor(data=null,index=null){
   (pairs.length ? pairs : [{model:"",price:""}]).forEach(addModelPriceRow);
   setCheck(data?.check ?? true);
   $("modal").classList.add("open");
+  document.body.classList.add("modal-open");
   setTimeout(()=>$("name").focus(),50);
 }
 function closeEditor(){
   $("modal").classList.remove("open");
+  document.body.classList.remove("modal-open");
 }
 window.toggleSiteModels = function(i){
   if(expandedSites.has(i)) expandedSites.delete(i);
@@ -1092,12 +1114,11 @@ window.deleteRow = function(i){
   if(confirm("删除这条记录？")){
     rows.splice(i,1);
     expandedSites.clear();
-    render();
+    render(true);
   }
 }
 $("addBtn").onclick = ()=>openEditor();
 $("closeBtn").onclick = closeEditor;
-$("modal").addEventListener("click",e=>{ if(e.target===$("modal")) closeEditor(); });
 $("checkYes").onclick = ()=>setCheck(true);
 $("checkNo").onclick = ()=>setCheck(false);
 $("addModelBtn").onclick = ()=>addModelPriceRow();
@@ -1106,7 +1127,7 @@ document.querySelectorAll(".filter-control").forEach(control=>{
   control.addEventListener("change", e=>{
     const key = e.target.dataset.filter;
     filterState[key] = e.target.value;
-    render();
+    render(false);
   });
 });
 document.addEventListener("change", e=>{
@@ -1120,7 +1141,8 @@ document.addEventListener("change", e=>{
   else selected.delete(input.value);
 
   filterState[kind] = [...selected];
-  render();
+  syncMultiFilterUI(kind);
+  render(false);
 });
 document.querySelectorAll("[data-reset-filters]").forEach(button=>{
   button.addEventListener("click", ()=>{
@@ -1129,7 +1151,7 @@ document.querySelectorAll("[data-reset-filters]").forEach(button=>{
     filterState.models = [];
     filterState.priceSort = "none";
     document.querySelectorAll(".multi-filter[open]").forEach(el=>el.open=false);
-    render();
+    render(false);
   });
 });
 document.addEventListener("click", e=>{
@@ -1173,7 +1195,7 @@ $("importFile").addEventListener("change", async e=>{
 
     rows = normalized;
     expandedSites.clear();
-    render();
+    render(true);
     alert("导入完成");
   }catch(err){
     alert("导入失败：请选择本网站导出的 JSON 备份文件。");
@@ -1191,9 +1213,9 @@ $("saveBtn").onclick = ()=>{
   else rows[editingIndex]=item;
   expandedSites.clear();
   closeEditor();
-  render();
+  render(true);
 };
-render();
+render(true);
 </script>
 </body>
 </html>
