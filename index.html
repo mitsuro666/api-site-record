@@ -384,6 +384,7 @@ td:last-child,th:last-child{border-right:none}
   line-height:1;
 }
 .mini-check.yes{background:var(--mint);color:#329866}
+.mini-check.conditional{background:#fff1c9;color:#a87818}
 .mini-check.no{background:#ffe0e7;color:#d85b7b}
 .site-url{
   min-width:0;
@@ -507,7 +508,7 @@ textarea{resize:vertical;min-height:110px}
 input:focus,textarea:focus,select:focus{border-color:var(--pink)}
 .seg{
   display:grid;
-  grid-template-columns:1fr 1fr;
+  grid-template-columns:repeat(3,1fr);
   gap:8px;
 }
 .seg button{
@@ -787,6 +788,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
       <select class="head-select filter-control" data-filter="check">
         <option value="all">全部</option>
         <option value="yes">有</option>
+        <option value="conditional">有条件</option>
         <option value="no">无</option>
       </select>
     </div>
@@ -823,6 +825,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
     <select class="filter-control" data-filter="check">
       <option value="all">签到：全部</option>
       <option value="yes">签到：有</option>
+      <option value="conditional">签到：有条件</option>
       <option value="no">签到：无</option>
     </select>
     <details class="multi-filter wide" data-multi-filter="models">
@@ -861,6 +864,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
         <label>签到</label>
         <div class="seg">
           <button type="button" id="checkYes">有</button>
+          <button type="button" id="checkConditional">有条件</button>
           <button type="button" id="checkNo">无</button>
         </div>
       </div>
@@ -936,18 +940,23 @@ function normalizeModelPrices(item){
   }
   return [];
 }
+function normalizeCheck(value){
+  if(value === true || value === "yes" || value === "有") return "yes";
+  if(value === "conditional" || value === "有条件") return "conditional";
+  return "no";
+}
 function normalizeRecord(item){
   return {
     name:String(item?.name ?? "").trim() || "未命名",
     url:String(item?.url ?? "").trim(),
-    check:Boolean(item?.check),
+    check:normalizeCheck(item?.check),
     modelPrices:normalizeModelPrices(item)
   };
 }
 const stored = JSON.parse(localStorage.getItem("api-records-demo") || "null");
 let rows = Array.isArray(stored) ? stored.map(normalizeRecord) : seed.map(normalizeRecord);
 let editingIndex = null;
-let checkValue = true;
+let checkValue = "yes";
 
 const $ = id => document.getElementById(id);
 const recordList = $("recordList");
@@ -1051,7 +1060,11 @@ function render(refreshFilters=true){
       const siteText = [
         r.name,
         r.url,
-        r.check ? "有 签到" : "无 不签到"
+        r.check === "yes"
+          ? "有 签到"
+          : r.check === "conditional"
+            ? "有条件 条件签到"
+            : "无 不签到"
       ].join(" ").toLowerCase();
 
       const siteMatchesSearch = !query || siteText.includes(query);
@@ -1069,7 +1082,7 @@ function render(refreshFilters=true){
       };
     })
     .filter(r => !filterState.sites.length || filterState.sites.includes(r.name))
-    .filter(r => filterState.check==="all" || (filterState.check==="yes" ? r.check : !r.check))
+    .filter(r => filterState.check==="all" || r.check===filterState.check)
     .filter(r => !filterState.models.length || r.visiblePairs.length>0)
     .filter(r => !query || r.siteMatchesSearch || r.visiblePairs.length>0);
 
@@ -1126,7 +1139,7 @@ function render(refreshFilters=true){
         <div class="site-summary">
           <div class="site-name">
             <span>${esc(r.name)}</span>
-            <span class="mini-check ${r.check?'yes':'no'}">${r.check?'有':'无'}</span>
+            <span class="mini-check ${r.check}">${r.check==="yes" ? "有" : r.check==="conditional" ? "有条件" : "无"}</span>
           </div>
           <div class="site-url">
             <a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.url)}</a>
@@ -1156,9 +1169,10 @@ function render(refreshFilters=true){
   localStorage.setItem("api-records-demo", JSON.stringify(rows));
 }
 function setCheck(v){
-  checkValue = v;
-  $("checkYes").classList.toggle("active", v);
-  $("checkNo").classList.toggle("active", !v);
+  checkValue = normalizeCheck(v);
+  $("checkYes").classList.toggle("active", checkValue==="yes");
+  $("checkConditional").classList.toggle("active", checkValue==="conditional");
+  $("checkNo").classList.toggle("active", checkValue==="no");
 }
 function modelOptionsHtml(selected=""){
   const isCustom = Boolean(selected && !MODEL_OPTIONS.includes(selected));
@@ -1222,7 +1236,7 @@ function openEditor(data=null,index=null){
   $("modelPriceList").innerHTML = "";
   const pairs = data ? normalizeModelPrices(data) : [];
   (pairs.length ? pairs : [{model:"",price:""}]).forEach(addModelPriceRow);
-  setCheck(data?.check ?? true);
+  setCheck(data?.check ?? "yes");
   $("modal").classList.add("open");
   document.body.classList.add("modal-open");
   setTimeout(()=>$("name").focus(),50);
@@ -1246,8 +1260,9 @@ window.deleteRow = function(i){
 }
 $("addBtn").onclick = ()=>openEditor();
 $("closeBtn").onclick = closeEditor;
-$("checkYes").onclick = ()=>setCheck(true);
-$("checkNo").onclick = ()=>setCheck(false);
+$("checkYes").onclick = ()=>setCheck("yes");
+$("checkConditional").onclick = ()=>setCheck("conditional");
+$("checkNo").onclick = ()=>setCheck("no");
 $("addModelBtn").onclick = ()=>addModelPriceRow();
 
 document.querySelectorAll(".text-search").forEach(input=>{
@@ -1295,7 +1310,7 @@ document.addEventListener("click", e=>{
 
 $("exportBtn").onclick = ()=>{
   const backup = {
-    version: 4,
+    version: 5,
     exportedAt: new Date().toISOString(),
     records: rows
   };
