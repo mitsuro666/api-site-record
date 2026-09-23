@@ -565,13 +565,41 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
 .model-extra-fields{
   grid-column:1 / 3;
   display:grid;
-  grid-template-columns:minmax(0,.75fr) minmax(0,1fr) minmax(0,1.4fr);
+  grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr) minmax(0,1fr);
   gap:8px;
 }
 .model-extra-fields input{font-size:13px}
+.model-row-actions{
+  grid-column:3;
+  grid-row:1 / span 3;
+  align-self:stretch;
+  display:grid;
+  grid-template-rows:repeat(3,1fr);
+  gap:6px;
+}
+.model-row-action{
+  width:38px;
+  min-height:32px;
+  border:0;
+  border-radius:11px;
+  cursor:pointer;
+  display:grid;
+  place-items:center;
+  padding:0;
+  line-height:1;
+  font-weight:900;
+}
 .remove-pair{
-  width:38px;height:38px;border:0;border-radius:11px;
-  background:#ffe7ed;color:#d95f80;cursor:pointer;font-weight:900;
+  background:#ffe7ed;
+  color:#d95f80;
+}
+.move-pair{
+  background:#eef6ff;
+  color:#4b91c5;
+}
+.model-row-action:disabled{
+  opacity:.32;
+  cursor:default;
 }
 .add-pair{
   margin-top:8px;border:1px dashed var(--pink);border-radius:12px;
@@ -808,8 +836,14 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
     padding:9px;
   }
   .model-price-row .price-input{grid-column:1}
-  .model-price-row .remove-pair{
-    grid-column:2;grid-row:1 / span 3;height:100%;min-height:82px;
+  .model-row-actions{
+    grid-column:2;
+    grid-row:1 / span 3;
+    align-self:stretch;
+  }
+  .model-row-action{
+    width:38px;
+    min-height:30px;
   }
   .custom-model-input{grid-column:1}
   .model-extra-fields{
@@ -1266,6 +1300,15 @@ function modelOptionsHtml(selected=""){
   const custom = `<option value="__custom__" ${isCustom?"selected":""}>＋ 自定义模型名称</option>`;
   return base + preset + custom;
 }
+function refreshModelOrderButtons(){
+  const modelRows = [...$("modelPriceList").querySelectorAll(".model-price-row")];
+  modelRows.forEach((row,index)=>{
+    const up = row.querySelector(".move-up");
+    const down = row.querySelector(".move-down");
+    if(up) up.disabled = index === 0;
+    if(down) down.disabled = index === modelRows.length - 1;
+  });
+}
 function addModelPriceRow(item={model:"",price:""}){
   const wrap = document.createElement("div");
   wrap.className = "model-price-row";
@@ -1273,7 +1316,11 @@ function addModelPriceRow(item={model:"",price:""}){
   wrap.innerHTML = `
     <select class="model-select">${modelOptionsHtml(item.model || "")}</select>
     <input class="price-input" placeholder="价格" value="${esc(item.price || "")}">
-    <button class="remove-pair" type="button" title="删除">×</button>
+    <div class="model-row-actions">
+      <button class="model-row-action remove-pair" type="button" title="删除模型">×</button>
+      <button class="model-row-action move-pair move-up" type="button" title="上移模型">↑</button>
+      <button class="model-row-action move-pair move-down" type="button" title="下移模型">↓</button>
+    </div>
     <input class="custom-model-input ${isCustom ? "show" : ""}" placeholder="输入自定义模型名称" value="${isCustom ? esc(item.model) : ""}">
     <div class="model-extra-fields">
       <input class="speed-input" placeholder="速度" value="${esc(item.speed || "")}">
@@ -1295,8 +1342,26 @@ function addModelPriceRow(item={model:"",price:""}){
     }
   });
 
-  wrap.querySelector(".remove-pair").onclick = ()=>wrap.remove();
+  wrap.querySelector(".remove-pair").onclick = ()=>{
+    wrap.remove();
+    refreshModelOrderButtons();
+  };
+  wrap.querySelector(".move-up").onclick = ()=>{
+    const prev = wrap.previousElementSibling;
+    if(prev){
+      $("modelPriceList").insertBefore(wrap, prev);
+      refreshModelOrderButtons();
+    }
+  };
+  wrap.querySelector(".move-down").onclick = ()=>{
+    const next = wrap.nextElementSibling;
+    if(next){
+      $("modelPriceList").insertBefore(next, wrap);
+      refreshModelOrderButtons();
+    }
+  };
   $("modelPriceList").appendChild(wrap);
+  refreshModelOrderButtons();
 }
 function getEditorModelPrices(){
   return [...$("modelPriceList").querySelectorAll(".model-price-row")].map(row=>{
