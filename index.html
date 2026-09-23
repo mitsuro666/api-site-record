@@ -447,7 +447,8 @@ td:last-child,th:last-child{border-right:none}
 .tags-cell{background:#fdfcff}
 .note-cell{background:#fffdfb;color:#596171}
 .model-data-row.last-row > div{border-bottom:none}
-.model-meta{display:none}
+.model-details-toggle,
+.model-meta-full{display:none}
 .pair-empty{color:var(--muted);font-weight:400}
 .model-toggle{
   grid-column:1/-1;
@@ -706,72 +707,62 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
     padding:10px 12px;
     border-bottom:0;
   }
-  .model-cell{grid-column:1;border-right:1px solid var(--line)}
+  .model-cell{
+    grid-column:1;
+    border-right:1px solid var(--line);
+    padding:0 2px 0 12px;
+    gap:6px;
+  }
+  .model-name-text{
+    flex:1;
+    min-width:0;
+    padding:10px 0;
+  }
+  .model-details-toggle{
+    display:grid;
+    place-items:center;
+    flex:0 0 36px;
+    width:36px;
+    min-height:44px;
+    align-self:stretch;
+    padding:0;
+    border:0;
+    border-radius:8px;
+    background:transparent;
+    color:#9b7f8a;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .model-details-arrow{
+    width:0;
+    height:0;
+    border-left:4px solid transparent;
+    border-right:4px solid transparent;
+    border-top:5px solid currentColor;
+  }
+  .model-details-toggle[aria-expanded="true"] .model-details-arrow{
+    transform:rotate(180deg);
+  }
+  .model-details-toggle:focus-visible{
+    outline:2px solid var(--pink-deep);
+    outline-offset:-2px;
+  }
   .price-cell{grid-column:2;border-right:none}
   .model-data-row > .speed-cell,
   .model-data-row > .tags-cell,
   .model-data-row > .note-cell{display:none}
-  .model-meta{
-    display:block;
+  .model-meta-full:not([hidden]){
+    display:grid;
     grid-column:1/-1;
-    min-width:0;
-    border-top:1px dashed #eee3dd;
-    background:#fffdfa;
-    font-size:12px;
-    color:#596171;
-  }
-  .model-meta > summary{
-    display:grid;
-    grid-template-columns:minmax(0,.9fr) minmax(0,1fr) minmax(0,1.35fr) 10px;
-    align-items:center;
-    gap:8px;
-    min-height:40px;
-    padding:8px 12px;
-    list-style:none;
-    cursor:pointer;
-    -webkit-tap-highlight-color:transparent;
-  }
-  .model-meta > summary::-webkit-details-marker{display:none}
-  .model-meta > summary::marker{content:""}
-  .model-meta > summary::after{
-    content:"";
-    width:6px;
-    height:6px;
-    border-right:1.5px solid var(--muted);
-    border-bottom:1.5px solid var(--muted);
-    transform:rotate(45deg);
-    justify-self:end;
-  }
-  .model-meta[open] > summary::after{transform:rotate(225deg)}
-  .model-meta > summary:focus-visible{
-    outline:2px solid var(--pink-deep);
-    outline-offset:-2px;
-  }
-  .model-meta-item{
-    display:flex;
-    align-items:baseline;
-    gap:4px;
-    min-width:0;
-  }
-  .model-meta-label{
-    flex:0 0 auto;
-    color:var(--muted);
-    font-weight:800;
-  }
-  .model-meta-value{
-    display:block;
-    min-width:0;
-    overflow:hidden;
-    white-space:nowrap;
-    text-overflow:ellipsis;
-  }
-  .model-meta-full{
-    display:grid;
     grid-template-columns:max-content minmax(0,1fr);
+    min-width:0;
     gap:8px;
     margin:0;
     padding:10px 12px 12px;
     border-top:1px dashed #eee3dd;
+    background:#fffdfa;
+    color:#596171;
+    font-size:12px;
     line-height:1.6;
   }
   .model-meta-full dt{color:var(--muted);font-weight:800}
@@ -1187,25 +1178,25 @@ function render(refreshFilters=true){
 
     const pairHtml = shownPairs.map((x,idx) => {
       const isLast = idx===shownPairs.length-1 && !canCollapse;
+      const metaId = `model-meta-${r._i}-${idx}`;
       return `
         <div class="model-data-row ${isLast ? "last-row" : ""}">
-          <div class="model-cell ${x.model ? "" : "pair-empty"}">${esc(x.model || "—")}</div>
+          <div class="model-cell ${x.model ? "" : "pair-empty"}">
+            <span class="model-name-text">${esc(x.model || "—")}</span>
+            <button class="model-details-toggle" type="button" aria-label="展开模型详情"
+                    aria-expanded="false" aria-controls="${metaId}" onclick="toggleModelDetails(this)">
+              <span class="model-details-arrow" aria-hidden="true"></span>
+            </button>
+          </div>
           <div class="price-cell ${x.price ? "" : "pair-empty"}">${esc(x.price || "—")}</div>
           <div class="speed-cell ${x.speed ? "" : "pair-empty"}">${esc(x.speed || "—")}</div>
           <div class="tags-cell ${x.tags ? "" : "pair-empty"}">${esc(x.tags || "—")}</div>
           <div class="note-cell ${x.note ? "" : "pair-empty"}">${esc(x.note || "—")}</div>
-          <details class="model-meta">
-            <summary title="展开或收起完整信息">
-              <span class="model-meta-item"><b class="model-meta-label">速度</b><span class="model-meta-value">${esc(x.speed || "—")}</span></span>
-              <span class="model-meta-item"><b class="model-meta-label">标签</b><span class="model-meta-value">${esc(x.tags || "—")}</span></span>
-              <span class="model-meta-item"><b class="model-meta-label">备注</b><span class="model-meta-value">${esc(x.note || "—")}</span></span>
-            </summary>
-            <dl class="model-meta-full">
-              <dt>速度</dt><dd>${esc(x.speed || "—")}</dd>
-              <dt>标签</dt><dd>${esc(x.tags || "—")}</dd>
-              <dt>备注</dt><dd>${esc(x.note || "—")}</dd>
-            </dl>
-          </details>
+          <dl class="model-meta-full" id="${metaId}" hidden>
+            <dt>速度</dt><dd>${esc(x.speed || "—")}</dd>
+            <dt>标签</dt><dd>${esc(x.tags || "—")}</dd>
+            <dt>备注</dt><dd>${esc(x.note || "—")}</dd>
+          </dl>
         </div>
       `;
     }).join("");
@@ -1248,6 +1239,15 @@ function render(refreshFilters=true){
   $("count").textContent = `共 ${filtered.length} 条记录`;
   localStorage.setItem("api-records-demo", JSON.stringify(rows));
 }
+// Toggle only this rendered model row; keep records and filter menus untouched.
+window.toggleModelDetails = function(button){
+  const panel = button.closest(".model-data-row")?.querySelector(".model-meta-full");
+  if(!panel) return;
+  const expanded = panel.hidden;
+  panel.hidden = !expanded;
+  button.setAttribute("aria-expanded", String(expanded));
+  button.setAttribute("aria-label", expanded ? "收起模型详情" : "展开模型详情");
+};
 function setCheck(v){
   checkValue = normalizeCheck(v);
   $("checkYes").classList.toggle("active", checkValue==="yes");
