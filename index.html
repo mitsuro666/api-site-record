@@ -562,24 +562,34 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
   background:#fffafd!important;
 }
 .custom-model-input.show{display:block}
-.model-extra-fields{
-  grid-column:1 / 3;
-  display:grid;
-  grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr) minmax(0,1fr);
-  gap:8px;
-}
-.model-extra-fields input{font-size:13px}
-.model-row-actions{
+.remove-pair{
   grid-column:3;
-  grid-row:1 / span 3;
-  align-self:stretch;
+  grid-row:1;
+  width:38px;
+  height:38px;
+  border:0;
+  border-radius:11px;
+  background:#ffe7ed;
+  color:#d95f80;
+  cursor:pointer;
+  font-weight:900;
+}
+.model-secondary-row{
+  grid-column:1 / -1;
   display:grid;
-  grid-template-rows:repeat(3,1fr);
+  grid-template-columns:minmax(0,.72fr) minmax(0,1fr) minmax(0,.9fr) 82px;
+  gap:8px;
+  align-items:center;
+}
+.model-secondary-row input{font-size:13px}
+.model-order-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
   gap:6px;
 }
 .model-row-action{
   width:38px;
-  min-height:32px;
+  height:38px;
   border:0;
   border-radius:11px;
   cursor:pointer;
@@ -588,10 +598,6 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
   padding:0;
   line-height:1;
   font-weight:900;
-}
-.remove-pair{
-  background:#ffe7ed;
-  color:#d95f80;
 }
 .move-pair{
   background:#eef6ff;
@@ -836,19 +842,33 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
     padding:9px;
   }
   .model-price-row .price-input{grid-column:1}
-  .model-row-actions{
+  .remove-pair{
+    grid-column:2;
+    grid-row:1;
+  }
+  .custom-model-input{grid-column:1}
+  .model-secondary-row{
+    grid-column:1 / -1;
+    grid-template-columns:minmax(0,1fr) 38px;
+    align-items:stretch;
+  }
+  .model-secondary-row .speed-input,
+  .model-secondary-row .tags-input,
+  .model-secondary-row .note-input{
+    grid-column:1;
+  }
+  .model-order-actions{
     grid-column:2;
     grid-row:1 / span 3;
+    grid-template-columns:1fr;
+    grid-template-rows:1fr 1fr;
     align-self:stretch;
+    gap:6px;
   }
   .model-row-action{
     width:38px;
-    min-height:30px;
-  }
-  .custom-model-input{grid-column:1}
-  .model-extra-fields{
-    grid-column:1;
-    grid-template-columns:1fr;
+    height:auto;
+    min-height:36px;
   }
   .save{padding:14px}
   @keyframes slideUp{
@@ -1316,16 +1336,16 @@ function addModelPriceRow(item={model:"",price:""}){
   wrap.innerHTML = `
     <select class="model-select">${modelOptionsHtml(item.model || "")}</select>
     <input class="price-input" placeholder="价格" value="${esc(item.price || "")}">
-    <div class="model-row-actions">
-      <button class="model-row-action remove-pair" type="button" title="删除模型">×</button>
-      <button class="model-row-action move-pair move-up" type="button" title="上移模型">↑</button>
-      <button class="model-row-action move-pair move-down" type="button" title="下移模型">↓</button>
-    </div>
+    <button class="remove-pair" type="button" title="删除模型">×</button>
     <input class="custom-model-input ${isCustom ? "show" : ""}" placeholder="输入自定义模型名称" value="${isCustom ? esc(item.model) : ""}">
-    <div class="model-extra-fields">
+    <div class="model-secondary-row">
       <input class="speed-input" placeholder="速度" value="${esc(item.speed || "")}">
       <input class="tags-input" placeholder="标签" value="${esc(item.tags || "")}">
       <input class="note-input" placeholder="备注" value="${esc(item.note || "")}">
+      <div class="model-order-actions">
+        <button class="model-row-action move-pair move-up" type="button" title="上移模型">↑</button>
+        <button class="model-row-action move-pair move-down" type="button" title="下移模型">↓</button>
+      </div>
     </div>
   `;
 
