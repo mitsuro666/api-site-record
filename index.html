@@ -416,7 +416,7 @@ td:last-child,th:last-child{border-right:none}
   font-size:11px;
   font-weight:900;
   color:#687080;
-  border-bottom:1px solid var(--line);
+  border-bottom:1px solid(var(--line));
   border-right:1px solid #f1e8e2;
 }
 .model-table-head:last-child{border-right:none}
@@ -447,6 +447,7 @@ td:last-child,th:last-child{border-right:none}
 .tags-cell{background:#fdfcff}
 .note-cell{background:#fffdfb;color:#596171}
 .model-data-row.last-row > div{border-bottom:none}
+.model-meta{display:none}
 .pair-empty{color:var(--muted);font-weight:400}
 .model-toggle{
   grid-column:1/-1;
@@ -707,19 +708,81 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
   }
   .model-cell{grid-column:1;border-right:1px solid var(--line)}
   .price-cell{grid-column:2;border-right:none}
-  .speed-cell,
-  .tags-cell,
-  .note-cell{
+  .model-data-row > .speed-cell,
+  .model-data-row > .tags-cell,
+  .model-data-row > .note-cell{display:none}
+  .model-meta{
+    display:block;
     grid-column:1/-1;
-    min-height:34px;
-    padding:7px 12px;
-    border-right:none;
+    min-width:0;
     border-top:1px dashed #eee3dd;
+    background:#fffdfa;
     font-size:12px;
+    color:#596171;
   }
-  .speed-cell::before{content:"速度  ";font-weight:800;color:var(--muted);margin-right:6px}
-  .tags-cell::before{content:"标签  ";font-weight:800;color:var(--muted);margin-right:6px}
-  .note-cell::before{content:"备注  ";font-weight:800;color:var(--muted);margin-right:6px}
+  .model-meta > summary{
+    display:grid;
+    grid-template-columns:minmax(0,.9fr) minmax(0,1fr) minmax(0,1.35fr) 10px;
+    align-items:center;
+    gap:8px;
+    min-height:40px;
+    padding:8px 12px;
+    list-style:none;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .model-meta > summary::-webkit-details-marker{display:none}
+  .model-meta > summary::marker{content:""}
+  .model-meta > summary::after{
+    content:"";
+    width:6px;
+    height:6px;
+    border-right:1.5px solid var(--muted);
+    border-bottom:1.5px solid var(--muted);
+    transform:rotate(45deg);
+    justify-self:end;
+  }
+  .model-meta[open] > summary::after{transform:rotate(225deg)}
+  .model-meta > summary:focus-visible{
+    outline:2px solid var(--pink-deep);
+    outline-offset:-2px;
+  }
+  .model-meta-item{
+    display:flex;
+    align-items:baseline;
+    gap:4px;
+    min-width:0;
+  }
+  .model-meta-label{
+    flex:0 0 auto;
+    color:var(--muted);
+    font-weight:800;
+  }
+  .model-meta-value{
+    display:block;
+    min-width:0;
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+  }
+  .model-meta-full{
+    display:grid;
+    grid-template-columns:max-content minmax(0,1fr);
+    gap:8px;
+    margin:0;
+    padding:10px 12px 12px;
+    border-top:1px dashed #eee3dd;
+    line-height:1.6;
+  }
+  .model-meta-full dt{color:var(--muted);font-weight:800}
+  .model-meta-full dd{
+    margin:0;
+    min-width:0;
+    white-space:pre-wrap;
+    overflow-wrap:anywhere;
+    -webkit-user-select:text;
+    user-select:text;
+  }
   .site-controls .del{
     display:grid;
     place-items:center;
@@ -1131,6 +1194,18 @@ function render(refreshFilters=true){
           <div class="speed-cell ${x.speed ? "" : "pair-empty"}">${esc(x.speed || "—")}</div>
           <div class="tags-cell ${x.tags ? "" : "pair-empty"}">${esc(x.tags || "—")}</div>
           <div class="note-cell ${x.note ? "" : "pair-empty"}">${esc(x.note || "—")}</div>
+          <details class="model-meta">
+            <summary title="展开或收起完整信息">
+              <span class="model-meta-item"><b class="model-meta-label">速度</b><span class="model-meta-value">${esc(x.speed || "—")}</span></span>
+              <span class="model-meta-item"><b class="model-meta-label">标签</b><span class="model-meta-value">${esc(x.tags || "—")}</span></span>
+              <span class="model-meta-item"><b class="model-meta-label">备注</b><span class="model-meta-value">${esc(x.note || "—")}</span></span>
+            </summary>
+            <dl class="model-meta-full">
+              <dt>速度</dt><dd>${esc(x.speed || "—")}</dd>
+              <dt>标签</dt><dd>${esc(x.tags || "—")}</dd>
+              <dt>备注</dt><dd>${esc(x.note || "—")}</dd>
+            </dl>
+          </details>
         </div>
       `;
     }).join("");
