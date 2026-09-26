@@ -546,7 +546,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
 .model-price-list{display:grid;gap:8px}
 .model-price-row{
   display:grid;
-  grid-template-columns:minmax(0,1.4fr) minmax(120px,.7fr) 38px;
+  grid-template-columns:minmax(0,.72fr) minmax(0,1fr) minmax(0,.9fr) 38px 38px;
   gap:8px;
   align-items:center;
   padding:10px;
@@ -555,6 +555,12 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
   background:#fffdfa;
 }
 .model-price-row select,.model-price-row input{min-width:0}
+.model-select{
+  grid-column:1 / 3;
+}
+.price-input{
+  grid-column:3 / 5;
+}
 .custom-model-input{
   grid-column:1 / 3;
   display:none;
@@ -563,7 +569,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
 }
 .custom-model-input.show{display:block}
 .remove-pair{
-  grid-column:3;
+  grid-column:5;
   grid-row:1;
   width:38px;
   height:38px;
@@ -577,12 +583,16 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
 .model-secondary-row{
   grid-column:1 / -1;
   display:grid;
-  grid-template-columns:minmax(0,.72fr) minmax(0,1fr) minmax(0,.9fr) 82px;
+  grid-template-columns:minmax(0,.72fr) minmax(0,1fr) minmax(0,.9fr) 38px 38px;
   gap:8px;
   align-items:center;
 }
+.model-secondary-row .speed-input{grid-column:1}
+.model-secondary-row .tags-input{grid-column:2}
+.model-secondary-row .note-input{grid-column:3}
 .model-secondary-row input{font-size:13px}
 .model-order-actions{
+  grid-column:4 / 6;
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:6px;
@@ -841,6 +851,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
     grid-template-columns:minmax(0,1fr) 38px;
     padding:9px;
   }
+  .model-price-row .model-select{grid-column:1}
   .model-price-row .price-input{grid-column:1}
   .remove-pair{
     grid-column:2;
@@ -1014,7 +1025,8 @@ const MODEL_OPTIONS = [
   "gpt-5.6-sol",
   "grok-4.6",
   "grok-4.7",
-  "kimi-k3"
+  "kimi-k3",
+  "qwen-3.8-max"
 ];
 
 const seed = [
