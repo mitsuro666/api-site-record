@@ -549,6 +549,9 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
   font-weight:900;
   cursor:pointer;
 }
+.mobile-editor-actions{
+  display:none;
+}
 .hint{
   font-size:11px;color:var(--muted);margin-top:4px;
 }
@@ -852,6 +855,33 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
   }
   .form-grid{grid-template-columns:1fr}
   .field.full{grid-column:auto}
+  .mobile-editor-actions{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+    grid-column:1/-1;
+    margin-top:2px;
+  }
+  .mobile-editor-actions button{
+    min-height:44px;
+    border-radius:12px;
+    font-weight:900;
+    cursor:pointer;
+  }
+  .mobile-add-model{
+    border:1px dashed var(--pink);
+    background:var(--pink-soft);
+    color:#c84f73;
+  }
+  .mobile-save{
+    border:0;
+    color:white;
+    background:linear-gradient(135deg,var(--pink),var(--pink-deep));
+  }
+  #addModelBtn,
+  #saveBtn{
+    display:none;
+  }
   input,textarea,select{font-size:16px}
   .model-price-row{
     grid-template-columns:minmax(0,1fr) 38px;
@@ -999,6 +1029,10 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
           <button type="button" id="checkConditional">有条件</button>
           <button type="button" id="checkNo">无</button>
         </div>
+      </div>
+      <div class="mobile-editor-actions">
+        <button class="mobile-add-model" type="button" id="mobileAddModelBtn">＋ 添加模型</button>
+        <button class="mobile-save" type="button" id="mobileSaveBtn">保存</button>
       </div>
       <div class="field full">
         <label>模型 / 价格 / 速度 / 标签 / 备注</label>
@@ -1449,6 +1483,7 @@ $("checkYes").onclick = ()=>setCheck("yes");
 $("checkConditional").onclick = ()=>setCheck("conditional");
 $("checkNo").onclick = ()=>setCheck("no");
 $("addModelBtn").onclick = ()=>addModelPriceRow();
+$("mobileAddModelBtn").onclick = ()=>addModelPriceRow();
 
 document.querySelectorAll(".text-search").forEach(input=>{
   input.addEventListener("input", e=>{
@@ -1536,7 +1571,7 @@ $("importFile").addEventListener("change", async e=>{
   }
 });
 
-$("saveBtn").onclick = ()=>{
+function saveCurrentRecord(){
   const item = {
     name:$("name").value.trim() || "未命名",
     url:$("url").value.trim(),
@@ -1548,7 +1583,9 @@ $("saveBtn").onclick = ()=>{
   expandedSites.clear();
   closeEditor();
   render(true);
-};
+}
+$("saveBtn").onclick = saveCurrentRecord;
+$("mobileSaveBtn").onclick = saveCurrentRecord;
 render(true);
 </script>
 </body>
