@@ -355,7 +355,7 @@ td:last-child,th:last-child{border-right:none}
 }
 .site-summary{
   display:grid;
-  grid-template-columns:minmax(180px,.95fr) minmax(260px,1.55fr) auto;
+  grid-template-columns:minmax(0,1fr) auto;
   gap:16px;
   align-items:center;
   min-height:58px;
@@ -371,6 +371,15 @@ td:last-child,th:last-child{border-right:none}
   gap:8px;
   flex-wrap:wrap;
   min-width:0;
+}
+.site-name-link{
+  color:inherit;
+  text-decoration:none;
+}
+.site-name-link:hover{
+  color:#d45f82;
+  text-decoration:underline;
+  text-underline-offset:3px;
 }
 .mini-check{
   display:inline-flex;
@@ -720,16 +729,13 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
   }
   .site-summary{
     display:block;
-    min-height:78px;
-    padding:12px 96px 10px 12px;
+    min-height:58px;
+    padding:12px 96px 12px 12px;
     background:#fffdfb;
   }
   .site-name{
     font-size:16px;
-    margin-bottom:5px;
-  }
-  .site-url a{
-    font-size:12px;
+    margin-bottom:0;
   }
   .site-controls{
     position:absolute;
@@ -1278,11 +1284,10 @@ function render(refreshFilters=true){
       <div class="site-record">
         <div class="site-summary">
           <div class="site-name">
-            <span>${esc(r.name)}</span>
+            ${r.url
+              ? `<a class="site-name-link" href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.name)}</a>`
+              : `<span>${esc(r.name)}</span>`}
             <span class="mini-check ${r.check}">${r.check==="yes" ? "有" : r.check==="conditional" ? "有条件" : "无"}</span>
-          </div>
-          <div class="site-url">
-            <a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.url)}</a>
           </div>
           <div class="site-controls">
             <button class="icon-btn edit" onclick="editRow(${r._i})" title="编辑">✎</button>
