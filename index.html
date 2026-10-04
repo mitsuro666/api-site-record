@@ -599,7 +599,19 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
   gap:8px;
   align-items:center;
 }
-.model-secondary-row .speed-input{grid-column:1}
+.model-secondary-row .type-editor{
+  grid-column:1;
+  min-width:0;
+  display:grid;
+  gap:6px;
+}
+.type-editor select,
+.type-editor input{
+  min-width:0;
+  font-size:13px;
+}
+.type-custom-input{display:none}
+.type-custom-input.show{display:block}
 .model-secondary-row .tags-input{grid-column:2}
 .model-secondary-row .note-input{grid-column:3}
 .model-secondary-row input{font-size:13px}
@@ -809,9 +821,9 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
   .model-meta-full:not([hidden]){
     display:grid;
     grid-column:1/-1;
-    grid-template-columns:max-content minmax(0,1fr);
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
     min-width:0;
-    gap:8px;
+    gap:8px 12px;
     margin:0;
     padding:10px 12px 12px;
     border-top:1px dashed #eee3dd;
@@ -820,15 +832,25 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
     font-size:12px;
     line-height:1.6;
   }
-  .model-meta-full dt{color:var(--muted);font-weight:800}
-  .model-meta-full dd{
-    margin:0;
+  .model-meta-item-full{
+    min-width:0;
+    display:flex;
+    gap:6px;
+    align-items:flex-start;
+  }
+  .model-meta-item-full b{
+    flex:0 0 auto;
+    color:var(--muted);
+    font-weight:800;
+  }
+  .model-meta-item-full span{
     min-width:0;
     white-space:pre-wrap;
     overflow-wrap:anywhere;
     -webkit-user-select:text;
     user-select:text;
   }
+  .model-meta-item-full.meta-note{grid-column:1/-1}
   .site-controls .del{
     display:grid;
     place-items:center;
@@ -910,9 +932,10 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
   .model-secondary-row{
     display:contents;
   }
-  .model-secondary-row .speed-input{
+  .model-secondary-row .type-editor{
     grid-column:2;
     grid-row:2;
+    min-width:0;
   }
   .model-secondary-row .tags-input{
     grid-column:1;
@@ -938,7 +961,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
   .model-price-row:has(.custom-model-input.show) .price-input{
     grid-row:3;
   }
-  .model-price-row:has(.custom-model-input.show) .speed-input{
+  .model-price-row:has(.custom-model-input.show) .type-editor{
     grid-row:3;
   }
   .model-price-row:has(.custom-model-input.show) .tags-input{
@@ -1068,7 +1091,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--pink)}
         <button class="mobile-save" type="button" id="mobileSaveBtn">保存</button>
       </div>
       <div class="field full">
-        <label>模型 / 价格 / 速度 / 标签 / 备注</label>
+        <label>模型 / 价格 / 类型 / 标签 / 备注</label>
         <div class="model-price-list" id="modelPriceList"></div>
         <button class="add-pair" type="button" id="addModelBtn">＋ 添加模型</button>
       </div>
@@ -1334,11 +1357,11 @@ function render(refreshFilters=true){
           <div class="speed-cell ${x.speed ? "" : "pair-empty"}">${esc(x.speed || "—")}</div>
           <div class="tags-cell ${x.tags ? "" : "pair-empty"}">${esc(x.tags || "—")}</div>
           <div class="note-cell ${x.note ? "" : "pair-empty"}">${esc(x.note || "—")}</div>
-          <dl class="model-meta-full" id="${metaId}" hidden>
-            <dt>速度</dt><dd>${esc(x.speed || "—")}</dd>
-            <dt>标签</dt><dd>${esc(x.tags || "—")}</dd>
-            <dt>备注</dt><dd>${esc(x.note || "—")}</dd>
-          </dl>
+          <div class="model-meta-full" id="${metaId}" hidden>
+            <div class="model-meta-item-full"><b>类型</b><span>${esc(x.speed || "—")}</span></div>
+            <div class="model-meta-item-full"><b>标签</b><span>${esc(x.tags || "—")}</span></div>
+            <div class="model-meta-item-full meta-note"><b>备注</b><span>${esc(x.note || "—")}</span></div>
+          </div>
         </div>
       `;
     }).join("");
@@ -1366,7 +1389,7 @@ function render(refreshFilters=true){
           <div class="model-table-head-row">
             <div class="model-table-head model-head">主要模型</div>
             <div class="model-table-head price-head">价格</div>
-            <div class="model-table-head speed-head">速度</div>
+            <div class="model-table-head speed-head">类型</div>
             <div class="model-table-head tags-head">标签</div>
             <div class="model-table-head note-head">备注</div>
           </div>
@@ -1404,6 +1427,15 @@ function modelOptionsHtml(selected=""){
   const custom = `<option value="__custom__" ${isCustom?"selected":""}>＋ 自定义模型名称</option>`;
   return base + preset + custom;
 }
+function typeOptionsHtml(selected=""){
+  const isPreset = selected === "按量" || selected === "按次";
+  return `
+    <option value="">选择类型</option>
+    <option value="按量" ${selected==="按量" ? "selected" : ""}>按量</option>
+    <option value="按次" ${selected==="按次" ? "selected" : ""}>按次</option>
+    <option value="__custom__" ${selected && !isPreset ? "selected" : ""}>自定义</option>
+  `;
+}
 function refreshModelOrderButtons(){
   const modelRows = [...$("modelPriceList").querySelectorAll(".model-price-row")];
   modelRows.forEach((row,index)=>{
@@ -1423,7 +1455,10 @@ function addModelPriceRow(item={model:"",price:""}, insertAtTop=false){
     <button class="remove-pair" type="button" title="删除模型">×</button>
     <input class="custom-model-input ${isCustom ? "show" : ""}" placeholder="输入自定义模型名称" value="${isCustom ? esc(item.model) : ""}">
     <div class="model-secondary-row">
-      <input class="speed-input" placeholder="速度" value="${esc(item.speed || "")}">
+      <div class="type-editor">
+        <select class="type-select">${typeOptionsHtml(item.speed || "")}</select>
+        <input class="type-custom-input ${item.speed && item.speed!=="按量" && item.speed!=="按次" ? "show" : ""}" placeholder="自定义类型" value="${item.speed && item.speed!=="按量" && item.speed!=="按次" ? esc(item.speed) : ""}">
+      </div>
       <input class="tags-input" placeholder="标签" value="${esc(item.tags || "")}">
       <input class="note-input" placeholder="备注" value="${esc(item.note || "")}">
       <div class="model-order-actions">
@@ -1435,6 +1470,8 @@ function addModelPriceRow(item={model:"",price:""}, insertAtTop=false){
 
   const select = wrap.querySelector(".model-select");
   const customInput = wrap.querySelector(".custom-model-input");
+  const typeSelect = wrap.querySelector(".type-select");
+  const typeCustomInput = wrap.querySelector(".type-custom-input");
 
   select.addEventListener("change", ()=>{
     const customMode = select.value === "__custom__";
@@ -1443,6 +1480,15 @@ function addModelPriceRow(item={model:"",price:""}, insertAtTop=false){
       setTimeout(()=>customInput.focus(), 0);
     }else{
       customInput.value = "";
+    }
+  });
+  typeSelect.addEventListener("change", ()=>{
+    const customMode = typeSelect.value === "__custom__";
+    typeCustomInput.classList.toggle("show", customMode);
+    if(customMode){
+      setTimeout(()=>typeCustomInput.focus(), 0);
+    }else{
+      typeCustomInput.value = "";
     }
   });
 
@@ -1475,7 +1521,9 @@ function getEditorModelPrices(){
     return {
       model:selectValue === "__custom__" ? customValue : selectValue,
       price:row.querySelector(".price-input").value.trim(),
-      speed:row.querySelector(".speed-input").value.trim(),
+      speed:row.querySelector(".type-select").value === "__custom__"
+        ? row.querySelector(".type-custom-input").value.trim()
+        : row.querySelector(".type-select").value.trim(),
       tags:row.querySelector(".tags-input").value.trim(),
       note:row.querySelector(".note-input").value.trim()
     };
