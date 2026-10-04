@@ -1413,7 +1413,7 @@ function refreshModelOrderButtons(){
     if(down) down.disabled = index === modelRows.length - 1;
   });
 }
-function addModelPriceRow(item={model:"",price:""}){
+function addModelPriceRow(item={model:"",price:""}, insertAtTop=false){
   const wrap = document.createElement("div");
   wrap.className = "model-price-row";
   const isCustom = Boolean(item.model && !MODEL_OPTIONS.includes(item.model));
@@ -1464,7 +1464,8 @@ function addModelPriceRow(item={model:"",price:""}){
       refreshModelOrderButtons();
     }
   };
-  $("modelPriceList").appendChild(wrap);
+  if(insertAtTop) $("modelPriceList").prepend(wrap);
+  else $("modelPriceList").appendChild(wrap);
   refreshModelOrderButtons();
 }
 function getEditorModelPrices(){
@@ -1516,7 +1517,7 @@ $("checkYes").onclick = ()=>setCheck("yes");
 $("checkConditional").onclick = ()=>setCheck("conditional");
 $("checkNo").onclick = ()=>setCheck("no");
 $("addModelBtn").onclick = ()=>addModelPriceRow();
-$("mobileAddModelBtn").onclick = ()=>addModelPriceRow();
+$("mobileAddModelBtn").onclick = ()=>addModelPriceRow({model:"",price:""}, true);
 
 document.querySelectorAll(".text-search").forEach(input=>{
   input.addEventListener("input", e=>{
